@@ -11,8 +11,14 @@ import SwiftUI
 struct TaskDetailsView: View {
 
     
-    @State public var ProjectId: String = "Aufgabe"
-    @State public var Progress:Float = 0.33
+    @State var name: String = ""
+    @State var desc: String = ""
+    @State var user: [String] = []
+    @State var guideTime: String = ""
+    @State var timeRecords: [Int] = []
+    
+    
+    @State var Progress:Float = 0.33
     
     @State var showTimeBook:Bool = false
 
@@ -27,7 +33,7 @@ struct TaskDetailsView: View {
                     HStack{
                         Text("Richtzeit:")
                         Spacer()
-                        Text("180 Minuten")
+                        Text("\(guideTime) Minuten")
                     }
                     HStack {
                         Text("Verbuchte Zeit:")
@@ -39,29 +45,19 @@ struct TaskDetailsView: View {
             }
             Section(header: Text("Beschreibung")){
                 ScrollView{
-                    Text("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.")
+                    Text(desc)
                 }.frame(height:145)
             }
             Section(header: Text("Beteiligte")){
                 ScrollView(.horizontal) {
-                    HStack{
-                        VStack{
-                            Image(systemName: "person.crop.circle").font(.system(size: 40.0)).padding(8)
-                            Text("Marino").font(.system(size: 12))
-                            Text("Bantli").font(.system(size: 12))
-
-                        }.frame(width: 60, height: 85).background(Color("LightGray")).cornerRadius(5)
-                        
-                        VStack{
-                            Image(systemName: "person.crop.circle").font(.system(size: 40.0)).padding(8)
-                            Text("Robin").font(.system(size: 12))
-                            Text("Portner").font(.system(size: 12))
-                            
-                        }.frame(width: 60, height: 85).background(Color("LightGray")).cornerRadius(5)
-            
-                        Spacer()
-                    }.frame(height:86, alignment: .top)
-                }
+                    if self.user.count == 0 {
+                        Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
+                    }
+                    else
+                    {
+                        UserCardView(ProjectMember: user)
+                    }
+                }.frame(height:86, alignment: .top)
 
             }
             Section(header: Text("Erfasste Zeiten")){
@@ -83,7 +79,7 @@ struct TaskDetailsView: View {
             }.listStyle(GroupedListStyle())
             
             
-        }.navigationBarTitle(ProjectId)
+        }.navigationBarTitle(name)
         .navigationBarItems(trailing:
             Button("Zeit erfassen") {
                 self.showTimeBook = true

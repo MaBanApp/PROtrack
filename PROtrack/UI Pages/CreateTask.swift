@@ -46,7 +46,7 @@ struct CreateTaskView: View {
                 
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        UserCardView(SelectedMembers: $selectedMembers, ProjectMemberFirstName: ["Marino", "Robin", "Vladislav"], ProjectMemberLastName: ["Bantli", "Portner", "Juhasz"])
+                        UserCardViewSelectable(SelectedMembers: $selectedMembers, ProjectMember: ["Marino Bantli", "Vladislav Juhasz", "Robin Portner"])
                     }
                 }
                 

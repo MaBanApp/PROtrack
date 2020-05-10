@@ -36,7 +36,7 @@ struct CreateProjectView: View {
                 
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        UserCardView(SelectedMembers: $selectedMembers, ProjectMemberFirstName: ProjectMemberFirstName, ProjectMemberLastName: ProjectMemberLastName)
+                        UserCardViewSelectable(SelectedMembers: $selectedMembers, ProjectMember: ["Marino Bantli", "Vladislav Juhasz", "Robin Portner"])
                     }
                 }
 

@@ -27,6 +27,7 @@ struct LogInView: View {
                         AppDelegate().dbhandler.getProjects(){result in
                             
                             let data: ProjectResponse = result
+                            print("Raw JSON: ", result)
                             
                             print("------------------")
                             print("Status: ", data.status)
@@ -83,7 +84,7 @@ struct LogInView: View {
                             .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
                     
                         Spacer().frame(height: 20)
-                        Button(action: {print("Test")
+                        Button(action: {print()
                             self.isLoggedIn = true
                             self.endEditing()
                         }) {Text("Anmelden").bold().font(.system(size: 20))}

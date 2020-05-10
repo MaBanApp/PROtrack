@@ -11,35 +11,57 @@ import SwiftUI
 struct ProjectOverviewView: View {
     
     @State var showNewProject: Bool = false
-    
+    @State var projData:ProjectResponse?
+    @State var ready: Bool = false
+
+        
     @Binding var isPresented: Bool
 
     var body: some View {
 
+        
         NavigationView {
-            
             List{
-                Section(header: Text("Laufende Projekte"))
-                {
-                    HStack {
-                        NavigationLink(destination: ProjectDetailsView(ProjectId: "Projekt 1")){
-                            Text("Projekt 1")
+                Section(header: Text("Laufende Projekte")){
+                    if !ready {
+                        Text("Lade Projekte...").italic().foregroundColor(Color.gray)
+                    }
+                    else
+                    {
+                        ForEach(0 ..< self.projData!.payload.count) {i in
+                                                        
+                            if self.projData!.payload[i].status == 0 {
+                                NavigationLink(destination: ProjectDetailsView(name: self.projData!.payload[i].name,
+                                                                               desc: self.projData!.payload[i].description,
+                                                                               user: self.projData!.payload[i].users,
+                                                                               tasks: self.projData!.payload[i].tasks)){
+                                    Text(self.projData!.payload[i].name)
+                                }
+                            }
+                            
                         }
                     }
-                    HStack {
-                        NavigationLink(destination: ProjectDetailsView(ProjectId: "Projekt 2")){
-                            Text("Projekt 2")
-                        }
-                    }
-                    HStack {
-                        NavigationLink(destination: ProjectDetailsView(ProjectId: "Projekt 3")){
-                            Text("Projekt 3")
-                        }
-                    }
+
                 }
                 
                 Section(header: Text("Abgeschlossene Projekte")){
-                    Text("Noch keine abgeschlossenen Projekte").italic().foregroundColor(Color.gray)
+                    if !ready {
+                        Text("Lade Projekte...").italic().foregroundColor(Color.gray)
+                    }
+                    else
+                    {
+                        ForEach(0 ..< self.projData!.payload.count) {i in
+                            if self.projData?.payload[i].status == 1 {
+                                NavigationLink(destination: ProjectDetailsView()) {
+                                   Text(self.projData!.payload[i].name)
+                                }
+                            }
+                            else
+                            {
+                                Text("Noch keine abgeschlossenen Projekte").italic().foregroundColor(Color.gray)
+                            }
+                        }
+                    }
                 }
 
             }
@@ -57,7 +79,13 @@ struct ProjectOverviewView: View {
                     }
             )
 
+        }.onAppear(){
+            AppDelegate().dbhandler.getProjects() {result in
+                self.projData = result
+                self.ready.toggle()
+            }
         }
+
     }
 
 }
