@@ -14,43 +14,17 @@ struct LogInView: View {
     @State var Password: String = ""
     @State var isLoggedIn: Bool = false
     @State var settingsShown:Bool = false
-
+    
+    @State var userData: [Int] = []
+    @State private var alertShown: Bool = false
+    @State private var message: String = ""
+    
     
     var body: some View {
         
         ZStack{
-            
             VStack{
-
                 HStack{
-                    Button("Test API") {
-                        AppDelegate().dbhandler.getProjects(){result in
-                            
-                            let data: ProjectResponse = result
-                            print("Raw JSON: ", result)
-                            
-                            print("------------------")
-                            print("Status: ", data.status)
-                            print("Message: ", data.message)
-                            print("------------------")
-                            print("Project id: ", data.payload[0].id)
-                            print("Project name: ", data.payload[0].name)
-                            print("Project users: ", data.payload[0].users)
-                            print("Project status: ", data.payload[0].status)
-                            print("Project description: ", data.payload[0].description)
-                            print("Project tasks: ", data.payload[0].tasks.count)
-                            print("------------------")
-                            print("Task id: ", data.payload[0].tasks[0].id)
-                            print("Task title: ", data.payload[0].tasks[0].title)
-                            print("Task description: ", data.payload[0].tasks[0].description)
-                            print("Task guidetime: ", data.payload[0].tasks[0].guideTime)
-                            print("Task timerecords: ", data.payload[0].tasks[0].timeRecords)
-                            print("Task users: ", data.payload[0].tasks[0].users)
-                            print("Task status: ", data.payload[0].tasks[0].status)
-                            print("------------------")
-                            
-                        }
-                    }
                     Spacer()
                     Image(systemName: "gear").foregroundColor(.blue).font(.system(size: 20.0)).padding(15).onTapGesture {
                         self.settingsShown.toggle()
@@ -82,23 +56,35 @@ struct LogInView: View {
                             }.padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
                             .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
-                    
                         Spacer().frame(height: 20)
-                        Button(action: {print()
-                            self.isLoggedIn = true
-                            self.endEditing()
-                        }) {Text("Anmelden").bold().font(.system(size: 20))}
-                        Spacer()
                     }
+                Button(action: {
+                    RequestService().logOn(username: self.Username, password: self.Password) {result, message in
+                        self.userData = result
+                     
+                        if !result.contains(0) {
+                            self.isLoggedIn.toggle()
+                        }
+                        else
+                        {
+                            self.message = message
+                            self.alertShown.toggle()
+                        }
+                    }
+                    self.endEditing()
+                    }) {Text("Anmelden").bold().font(.system(size: 20))}
+                    .alert(isPresented: self.$alertShown) {
+                        Alert(title: Text("Fehler beim Anmelden"), message: Text(message), dismissButton: .default(Text("OK")))
+                    }
+                Spacer()
                 }
-
             
             if isLoggedIn {
-                if Username == "Admin" {
-                    ProjectOverviewView(isPresented: $isLoggedIn)
+                if userData[1] == 2 {
+                    ProjectOverviewView(userID: userData[0], isPresented: $isLoggedIn)
                 }
-                if Username == "User" {
-                    TaskOverviewView(isPresented: $isLoggedIn)
+                if userData[1] == 1 {
+                    TaskOverviewView(userID: userData[0], isPresented: $isLoggedIn)
                 }
             }
         }

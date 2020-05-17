@@ -13,16 +13,15 @@ struct TaskDetailsView: View {
     
     @State var name: String = ""
     @State var desc: String = ""
-    @State var user: [String] = []
+    @State var user: [UserData] = []
     @State var guideTime: String = ""
-    @State var timeRecords: [Int] = []
-    
-    
-    @State var Progress:Float = 0.33
-    
-    @State var showTimeBook:Bool = false
+    @State var timeRecords: [TimeRecords] = []
 
-    @State var showingAlert = false
+    
+    @State private var showTimeBook:Bool = false
+    @State private var showingAlert = false
+    @State private var progress: Float = 0
+    @State private var isExpanded: Bool = false
 
     
     var body: some View {
@@ -38,10 +37,13 @@ struct TaskDetailsView: View {
                     HStack {
                         Text("Verbuchte Zeit:")
                         Spacer()
-                        Text("60 Minuten")
+                        Text(progressService().getBookedTime(bookedTime: timeRecords))
                     }
-                    ProgressBar(value: $Progress).frame(height:10)
+                    ProgressBar(value: $progress).frame(height:10)
                 }.frame(height: 70)
+                .onAppear() {
+                    self.progress = progressService().getProgress(guideTime: self.guideTime, bookedTime: self.timeRecords)
+            }
             }
             Section(header: Text("Beschreibung")){
                 ScrollView{
@@ -55,16 +57,58 @@ struct TaskDetailsView: View {
                     }
                     else
                     {
-                        UserCardView(ProjectMember: user)
+                        UserCardView(ProjectMember: ["user"] )
                     }
                 }.frame(height:86, alignment: .top)
 
             }
-            Section(header: Text("Erfasste Zeiten")){
-                
-                Text("Hier könnte Ihre Zeit stehen...")
-                
+            Section(header: VStack(alignment: .leading){
+                VStack(alignment: .leading) {
+                    Text("Erfasste Zeiten").frame(height: 40)
+                    
+                    HStack {
+                        Text("Datum").bold().frame(width: 140, alignment: .leading)
+                        Text("Zeit").bold().frame(width: 140, alignment: .leading)
+                        Spacer()
+                        Text("Name").bold()
+                     }
+                }
+
+ 
+                } ) {
+            if timeRecords.count == 0 {
+                Text("Noch keine Zeiten verbucht").italic().foregroundColor(Color.gray)
             }
+            else
+            {
+                ForEach (0..<timeRecords.count) {i in
+                    VStack (alignment: .leading) {
+                        HStack {
+                            Text(self.timeRecords[i].date).frame(width: 140, alignment: .leading)
+                            //Text("\(self.timeRecords[i].date.timestamp)")
+                            Text("\(self.timeRecords[i].time) Minuten").frame(width: 140, alignment: .leading)
+                            Spacer()
+                            Text("\(self.timeRecords[i].user.name)")
+                            
+                        }
+                        
+                        if self.isExpanded {
+                            Spacer()
+                            Text("Bemerkungen").bold().frame(height: 30, alignment: .leading)
+                            Text(self.timeRecords[i].description).frame(alignment: .leading)
+                        }
+                    
+                    }.onTapGesture {
+                        withAnimation(.linear(duration: 0.2)) {
+                            self.isExpanded.toggle()
+                        }
+                    
+                        
+                    }
+                }
+            }
+        }
+            
             Section(header: Text("Aufgabe verwalten")){
              
                 Button("Aufgabe bearbeiten"){
@@ -90,6 +134,7 @@ struct TaskDetailsView: View {
         
         
     }
+    
 }
 
 struct TaskDetailsView_preview: PreviewProvider {

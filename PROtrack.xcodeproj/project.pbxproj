@@ -30,7 +30,7 @@
 		87C22ADD245F5A1E0014658A /* CreateTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C22ADC245F5A1D0014658A /* CreateTask.swift */; };
 		87F9F8BA24670A5200765BA5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 87F9F8B924670A5200765BA5 /* SwiftyJSON */; };
 		87F9F8BC246721CC00765BA5 /* ServerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F9F8BB246721CB00765BA5 /* ServerData.swift */; };
-		87FC77E1246692880043E140 /* DBHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FC77E0246692880043E140 /* DBHandler.swift */; };
+		87FC77E1246692880043E140 /* RequestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FC77E0246692880043E140 /* RequestService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +79,7 @@
 		87C22ADA245F5A180014658A /* CreateProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateProject.swift; sourceTree = "<group>"; };
 		87C22ADC245F5A1D0014658A /* CreateTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTask.swift; sourceTree = "<group>"; };
 		87F9F8BB246721CB00765BA5 /* ServerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerData.swift; sourceTree = "<group>"; };
-		87FC77E0246692880043E140 /* DBHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBHandler.swift; sourceTree = "<group>"; };
+		87FC77E0246692880043E140 /* RequestService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +121,7 @@
 		876AF70624632510009A0F22 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				87FC77E0246692880043E140 /* DBHandler.swift */,
+				87FC77E0246692880043E140 /* RequestService.swift */,
 				87F9F8BB246721CB00765BA5 /* ServerData.swift */,
 			);
 			path = Logic;
@@ -355,7 +355,7 @@
 				87C22AD2245F59AE0014658A /* ProjectDetails.swift in Sources */,
 				87C22AD7245F59DD0014658A /* TaskDetails.swift in Sources */,
 				87C22AD9245F5A0A0014658A /* Time.swift in Sources */,
-				87FC77E1246692880043E140 /* DBHandler.swift in Sources */,
+				87FC77E1246692880043E140 /* RequestService.swift in Sources */,
 				8765E1B62466A495004A3DBF /* UserCardView.swift in Sources */,
 				8765E1B82466D232004A3DBF /* Settings.swift in Sources */,
 				87C22AD5245F59D60014658A /* TaskOverview.swift in Sources */,

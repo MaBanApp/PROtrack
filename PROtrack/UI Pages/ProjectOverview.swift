@@ -10,16 +10,19 @@ import SwiftUI
 
 struct ProjectOverviewView: View {
     
-    @State var showNewProject: Bool = false
-    @State var projData:ProjectResponse?
-    @State var ready: Bool = false
-
-        
+    //Initalizer vars
+    @State var userID: Int
     @Binding var isPresented: Bool
+
+    
+    //Local vars
+    @State private var showNewProject: Bool = false
+    @State private var projData: ProjectResponse?
+    @State private var ready: Bool = false
+
 
     var body: some View {
 
-        
         NavigationView {
             List{
                 Section(header: Text("Laufende Projekte")){
@@ -28,9 +31,8 @@ struct ProjectOverviewView: View {
                     }
                     else
                     {
-                        ForEach(0 ..< self.projData!.payload.count) {i in
-                                                        
-                            if self.projData!.payload[i].status == 0 {
+                        ForEach (0 ..< self.projData!.payload.count) {i in
+                            if self.projData!.payload[i].status == 1 {
                                 NavigationLink(destination: ProjectDetailsView(name: self.projData!.payload[i].name,
                                                                                desc: self.projData!.payload[i].description,
                                                                                user: self.projData!.payload[i].users,
@@ -38,10 +40,9 @@ struct ProjectOverviewView: View {
                                     Text(self.projData!.payload[i].name)
                                 }
                             }
-                            
                         }
-                    }
 
+                    }
                 }
                 
                 Section(header: Text("Abgeschlossene Projekte")){
@@ -50,10 +51,10 @@ struct ProjectOverviewView: View {
                     }
                     else
                     {
-                        ForEach(0 ..< self.projData!.payload.count) {i in
-                            if self.projData?.payload[i].status == 1 {
+                        ForEach(0 ..< 1) {i in
+                            if self.projData?.payload[i].status == 2 {
                                 NavigationLink(destination: ProjectDetailsView()) {
-                                   Text(self.projData!.payload[i].name)
+                                    Text("Projekt A")
                                 }
                             }
                             else
@@ -80,13 +81,11 @@ struct ProjectOverviewView: View {
             )
 
         }.onAppear(){
-            AppDelegate().dbhandler.getProjects() {result in
+            RequestService().getProjects(userID: self.userID) {result in
                 self.projData = result
                 self.ready.toggle()
             }
         }
-
     }
-
+    
 }
-

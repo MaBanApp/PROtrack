@@ -9,30 +9,47 @@
 import Foundation
 
 struct ProjectResponse: Codable {
-    let message: String
-    let status: Int
-    let payload: [ProjectData]
+    let message     : String
+    let status      : Int
+    let payload     : [ProjectPayload]
 }
 
-struct ProjectData: Codable {
-    
-    let id: Int
-    let users: [String]
-    let name: String
-    let status: Int
-    let tasks: [TaskData]
-    let description: String
-    
+struct TaskResponse: Codable {
+    let message     : String
+    let status      : Int
+    let payload     : [TaskPayload]
 }
 
-struct TaskData: Codable {
-    
-    let description: String
-    let project: Int
-    let id: Int
-    let status: Int
-    let guideTime: String
-    let timeRecords: [Int]
-    let users: [String]
-    let title: String
+struct ProjectPayload: Codable {
+    let id          : Int
+    let name        : String
+    let description : String
+    let status      : Int
+    let tasks       : [TaskPayload]
+    let users       : [UserData]
+}
+
+struct TaskPayload: Codable {
+    let id          : Int
+    let title       : String
+    let description : String
+    let guide_time  : String
+    let status      : Int
+    let users       : [UserData]
+    let records     : [TimeRecords]
+}
+
+struct UserData: Codable {
+    let id          : Int
+    let name        : String
+    let role        : Int
+}
+
+struct TimeRecords: Codable {
+    let id          : Int
+    let task        : Int
+    let user        : UserData
+    let description : String
+    let date        : String
+    let time        : String
 }

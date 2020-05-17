@@ -46,7 +46,7 @@ struct CreateProjectView: View {
                 leading:
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
-                Button("Erstellen") { print(AppDelegate().dbhandler.getSelectedUser(firstName: self.ProjectMemberFirstName, lastName: self.ProjectMemberLastName, selected: self.selectedMembers))}
+                Button("Erstellen") { print(RequestService().getSelectedUser(firstName: self.ProjectMemberFirstName, lastName: self.ProjectMemberLastName, selected: self.selectedMembers))}
             )
             .listStyle(GroupedListStyle())
 
