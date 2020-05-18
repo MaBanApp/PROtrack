@@ -17,9 +17,10 @@ struct ProjectOverviewView: View {
     
     //Local vars
     @State private var showNewProject: Bool = false
-    @State private var projData: ProjectResponse?
     @State private var ready: Bool = false
 
+    //Data var
+    @State var projData: ProjectResponse?
 
     var body: some View {
 
@@ -52,7 +53,7 @@ struct ProjectOverviewView: View {
                     else
                     {
                         ForEach(0 ..< 1) {i in
-                            if self.projData?.payload[i].status == 2 {
+                            if self.projData!.payload[i].status == 2 {
                                 NavigationLink(destination: ProjectDetailsView()) {
                                     Text("Projekt A")
                                 }
@@ -81,10 +82,11 @@ struct ProjectOverviewView: View {
             )
 
         }.onAppear(){
-            RequestService().getProjects(userID: self.userID) {result in
-                self.projData = result
+            RequestService().getProjects() {data in
+                self.projData = data
                 self.ready.toggle()
             }
+            
         }
     }
     

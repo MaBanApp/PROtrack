@@ -16,6 +16,7 @@ struct TaskDetailsView: View {
     @State var user: [UserData] = []
     @State var guideTime: String = ""
     @State var timeRecords: [TimeRecords] = []
+    @State var taskID: Int = 0
 
     
     @State private var showTimeBook:Bool = false
@@ -67,10 +68,9 @@ struct TaskDetailsView: View {
                     Text("Erfasste Zeiten").frame(height: 40)
                     
                     HStack {
-                        Text("Datum").bold().frame(width: 140, alignment: .leading)
-                        Text("Zeit").bold().frame(width: 140, alignment: .leading)
-                        Spacer()
-                        Text("Name").bold()
+                        Text("Datum").bold().frame(width: 120, alignment: .leading)
+                        Text("Zeit").bold().frame(width: 120, alignment: .leading)
+                        Text("Name").bold().frame(minWidth: 120, alignment: .leading)
                      }
                 }
 
@@ -84,11 +84,10 @@ struct TaskDetailsView: View {
                 ForEach (0..<timeRecords.count) {i in
                     VStack (alignment: .leading) {
                         HStack {
-                            Text(self.timeRecords[i].date).frame(width: 140, alignment: .leading)
+                            Text(self.timeRecords[i].date).frame(width: 120, alignment: .leading)
                             //Text("\(self.timeRecords[i].date.timestamp)")
-                            Text("\(self.timeRecords[i].time) Minuten").frame(width: 140, alignment: .leading)
-                            Spacer()
-                            Text("\(self.timeRecords[i].user.name)")
+                            Text("\(self.timeRecords[i].time) Minuten").frame(width: 120, alignment: .leading)
+                            Text("\(self.timeRecords[i].user.name)").frame(minWidth: 120, alignment: .leading)
                             
                         }
                         
@@ -128,11 +127,10 @@ struct TaskDetailsView: View {
             Button("Zeit erfassen") {
                 self.showTimeBook = true
             }.sheet(isPresented: $showTimeBook){
-                TimeView(isPresented: self.$showTimeBook)
+                TimeView(taskID: self.taskID, isPresented: self.$showTimeBook)
             }
         )
-        
-        
+
     }
     
 }

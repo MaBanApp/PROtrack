@@ -12,7 +12,7 @@ import SwiftyJSON
 
 
 class RequestService {
-    
+
     //Returns array of "UserID" and "Role" and a Message from the API
     func logOn(username: String, password: String, completion: @escaping ([Int], String) -> Void) {
         let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/authenticate"
@@ -25,15 +25,16 @@ class RequestService {
                 do {
                     let json = JSON(data)
                     result = [json["payload"]["id"].intValue, json["payload"]["role"].intValue]
+                    AppDelegate().settings.setValue(json["payload"]["id"].intValue, forKey: "UserID")
                     completion(result, json["message"].stringValue)
                 }
         }
     }
     
     //Get a List of all Projects
-    func getProjects(userID: Int, completion: @escaping (ProjectResponse) -> Void) {
+    func getProjects(completion: @escaping (ProjectResponse) -> Void) {
         
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/projects?user=" + String(userID)
+        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/projects?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))
         
         AF.request(url, method: .get).response {response in
                         
@@ -48,9 +49,9 @@ class RequestService {
     }
     
     //Get a List of all Projects
-    func getTasks(userID: Int, completion: @escaping (TaskResponse) -> Void) {
+    func getTasks(completion: @escaping (TaskResponse) -> Void) {
         
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/tasks?user=" + String(userID)
+        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/tasks?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))
         
         AF.request(url, method: .get).response {response in
                         
@@ -64,6 +65,22 @@ class RequestService {
         }
     }
     
+    //Book time on Project
+    func bookTime (taskID: Int , time: String, date: String, desc: String, completion: @escaping (Bool, String, Int) -> Void) {
+        let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
+        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/task/" + String(taskID) + "/records?user=" + userID
+        let params = ["user" : userID, "date" : date, "time" : time, "description" : desc] as [String : Any]
+        
+        AF.request(url, method: .post, parameters: params).responseJSON {response in
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    completion(true, json["message"].stringValue, json["status"].intValue)
+                }
+        }
+        
+    }
+        
     func getSelectedUser(firstName: [String], lastName: [String], selected: [Int]) -> [String]{
         
         var SelectedUser: [String] = []

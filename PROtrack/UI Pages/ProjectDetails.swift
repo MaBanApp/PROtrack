@@ -81,7 +81,8 @@ struct ProjectDetailsView: View {
                         NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
                                                                     desc: self.tasks![i].description,
                                                                     guideTime: self.tasks![i].guide_time,
-                                                                    timeRecords: self.tasks![i].records)){
+                                                                    timeRecords: self.tasks![i].records,
+                                                                    taskID: self.tasks![i].id)){
                             Text(self.tasks![i].title)
                         }
                     }

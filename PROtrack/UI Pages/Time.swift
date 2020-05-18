@@ -10,12 +10,20 @@ import SwiftUI
 
 struct TimeView: View {
     
-    @State var time:String = ""
-    @State var date = Date()
-    @State var notes:String = ""
+    //Initalizer vars
+    @State var taskID: Int = 0
     
+    //Private vars
+    @State private var time:String = ""
+    @State private var date = Date()
+    @State private var notes:String = ""
+    @State private var userID: Int = AppDelegate().settings.integer(forKey: "UserID")
+    @State private var APImessage: String = ""
+    
+    //UI Vars
     @Binding var isPresented: Bool
-    @State var isEditing:Bool = false
+    @State private var isEditing:Bool = false
+    @State private var showingAlert: Bool = false
     
     
     var body: some View {
@@ -61,7 +69,27 @@ struct TimeView: View {
                 leading:
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
-                    Button("Erfassen") { print("Project created")}
+                    Button("Erfassen") {
+                        let formatter = DateFormatter()
+                        formatter.dateStyle = .medium
+                        print(formatter.string(from: self.date))
+                        RequestService().bookTime(taskID: self.taskID, time: self.time, date: formatter.string(from: self.date), desc: self.notes) { didFinish, message, status in
+                            
+                            if status < 300 {
+                                self.APImessage = message
+                                self.showingAlert.toggle()
+                            }
+                            else
+                            {
+                                self.showingAlert.toggle()
+                                self.APImessage = message
+                            }
+                        }
+                    }.alert(isPresented: self.$showingAlert) {
+                        Alert(title: Text("Zeit gebucht"), message: Text(APImessage), dismissButton: .default(Text("OK").bold(), action: {
+                            self.isPresented.toggle()
+                    }))
+                }
             )
             .listStyle(GroupedListStyle())
 
