@@ -32,6 +32,7 @@
 		87F9F8BA24670A5200765BA5 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 87F9F8B924670A5200765BA5 /* SwiftyJSON */; };
 		87F9F8BC246721CC00765BA5 /* ServerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F9F8BB246721CB00765BA5 /* ServerData.swift */; };
 		87FC77E1246692880043E140 /* RequestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87FC77E0246692880043E140 /* RequestService.swift */; };
+		87FE5877247550D300733FB6 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 87FE5876247550D300733FB6 /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,8 @@
 		87C22ADC245F5A1D0014658A /* CreateTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTask.swift; sourceTree = "<group>"; };
 		87F9F8BB246721CB00765BA5 /* ServerData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerData.swift; sourceTree = "<group>"; };
 		87FC77E0246692880043E140 /* RequestService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestService.swift; sourceTree = "<group>"; };
+		87FE58752475509F00733FB6 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		87FE5876247550D300733FB6 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +145,8 @@
 		87C22A90245F58E90014658A = {
 			isa = PBXGroup;
 			children = (
+				87FE5876247550D300733FB6 /* .gitignore */,
+				87FE58752475509F00733FB6 /* README.md */,
 				87C22A9B245F58E90014658A /* PROtrack */,
 				87C22AB2245F58EB0014658A /* PROtrackTests */,
 				87C22ABD245F58EB0014658A /* PROtrackUITests */,
@@ -334,6 +339,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				87FE5877247550D300733FB6 /* .gitignore in Resources */,
 				87C22AA9245F58EB0014658A /* LaunchScreen.storyboard in Resources */,
 				87425E6C24642EC90014C137 /* Colors.xcassets in Resources */,
 				87C22AA6245F58EB0014658A /* Preview Assets.xcassets in Resources */,
