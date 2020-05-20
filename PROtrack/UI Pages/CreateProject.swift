@@ -18,6 +18,8 @@ struct CreateProjectView: View {
     @State var ProjectMemberLastName: [String] = ["Bantli", "Portner", "Juhasz"]
     
     @Binding var isPresented: Bool
+    @State private var showingAlert: Bool = false
+    @State private var APIResponse: String = ""
         
     var body: some View {
         
@@ -46,12 +48,25 @@ struct CreateProjectView: View {
                 leading:
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
-                Button("Erstellen") { print(RequestService().getSelectedUser(firstName: self.ProjectMemberFirstName, lastName: self.ProjectMemberLastName, selected: self.selectedMembers))}
-            )
+                Button("Erstellen") {
+                    RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription){ message, status in
+                            if status >= 300 {
+                                self.APIResponse = message
+                            }
+                            if status <= 300 {
+                                self.APIResponse = message
+                                self.showingAlert.toggle()
+                            }
+                        }
+                })
             .listStyle(GroupedListStyle())
 
 
-            }.navigationViewStyle(StackNavigationViewStyle())
+            }.alert(isPresented: self.$showingAlert) {
+                Alert(title: Text("Projekt erstellt"), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                    self.isPresented.toggle()
+            }))}
+            .navigationViewStyle(StackNavigationViewStyle())
 
     }
 }

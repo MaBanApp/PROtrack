@@ -72,28 +72,30 @@ struct TimeView: View {
                     Button("Erfassen") {
                         let formatter = DateFormatter()
                         formatter.dateStyle = .medium
-                        print(formatter.string(from: self.date))
                         RequestService().bookTime(taskID: self.taskID, time: self.time, date: formatter.string(from: self.date), desc: self.notes) { didFinish, message, status in
-                            
                             if status < 300 {
                                 self.APImessage = message
-                                self.showingAlert.toggle()
+                                DispatchQueue.main.async {
+                                    self.showingAlert.toggle()
+                                }
+                                
                             }
                             else
                             {
-                                self.showingAlert.toggle()
                                 self.APImessage = message
+                                self.showingAlert.toggle()
                             }
                         }
-                    }.alert(isPresented: self.$showingAlert) {
-                        Alert(title: Text("Zeit gebucht"), message: Text(APImessage), dismissButton: .default(Text("OK").bold(), action: {
-                            self.isPresented.toggle()
-                    }))
-                }
+                    }
             )
             .listStyle(GroupedListStyle())
 
-        }.navigationViewStyle(StackNavigationViewStyle())
+        }.alert(isPresented: self.$showingAlert) {
+                Alert(title: Text("Zeit gebucht"), message: Text(APImessage), dismissButton: .default(Text("OK").bold(), action: {
+                    self.isPresented.toggle()
+            }))
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     func endEditing() {

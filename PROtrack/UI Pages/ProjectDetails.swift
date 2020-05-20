@@ -15,13 +15,14 @@ struct ProjectDetailsView: View {
     @State var desc: String = ""
     @State var user: [UserData]?
     @State var tasks:[TaskPayload]?
+    @State var projectID: Int = 0
+    @State var payloadID: Int = 0
     
     
     //Local vars
     @State private var Progress: Float = 0.33
     @State private var showNewTask: Bool = false
     @State private var showingAlert = false
-
     
     var body: some View {
         
@@ -58,7 +59,6 @@ struct ProjectDetailsView: View {
                 }.frame(height:145)
             }
             Section(header: Text("Beteiligte")){
-                
                 ScrollView(.horizontal) {
                     if self.user!.count == 0 {
                         Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
@@ -72,26 +72,25 @@ struct ProjectDetailsView: View {
             }
             Section(header: Text("Projektaufgaben")){
                 
-                if self.tasks?.count == 0 {
+                if tasks?.count == 0{
                     Text("Noch keine Aufgaben hinzugefügt").italic().foregroundColor(Color.gray)
                 }
                 else
                 {
-                    ForEach (0 ..< self.tasks!.count) {i in
+                    ForEach (tasks!.indices) {i in
                         NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
                                                                     desc: self.tasks![i].description,
                                                                     guideTime: self.tasks![i].guide_time,
-                                                                    timeRecords: self.tasks![i].records,
                                                                     taskID: self.tasks![i].id)){
                             Text(self.tasks![i].title)
                         }
-                    }
+                    }.id(UUID())
+                    
                 }
                         
             }
-            
             Section(header: Text("Projekt verwalten")){
-             
+            
                 Button("Projekt bearbeiten"){
                     print("edit pressed")
                 }.foregroundColor(Color.blue)
@@ -108,11 +107,17 @@ struct ProjectDetailsView: View {
         .navigationBarItems(trailing:
             Button("Neue Aufgabe") {
                 self.showNewTask = true
-            }.sheet(isPresented: $showNewTask){
-                CreateTaskView(isPresented: self.$showNewTask)
-            }
-        )
+            }.sheet(isPresented: $showNewTask, onDismiss: {self.updateView()}){
+                CreateTaskView(projectID: self.projectID, isPresented: self.$showNewTask)
+        })
     }
+    
+    func updateView() {
+        RequestService().getProjects() { data in
+            self.tasks = data.payload[self.payloadID].tasks
+        }
+    }
+
 }
 
 struct ProjectDetailsView_Preview: PreviewProvider {

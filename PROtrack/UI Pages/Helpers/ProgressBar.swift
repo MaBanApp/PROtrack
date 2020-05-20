@@ -22,7 +22,7 @@ struct ProgressBar: View {
                 
                 Rectangle().frame(width: min(CGFloat(self.value)*geometry.size.width, geometry.size.width), height: geometry.size.height)
                     .foregroundColor(self.value <= 1 ? Color(UIColor.systemBlue) : Color(UIColor.systemRed))
-                    .animation(.linear)
+                    .animation(.easeOut(duration: 0.6))
             }.cornerRadius(45.0)
         }
     }

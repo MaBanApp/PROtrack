@@ -12,60 +12,56 @@ struct ProjectOverviewView: View {
     
     //Initalizer vars
     @State var userID: Int
+    @State var projData: ProjectResponse?
     @Binding var isPresented: Bool
 
-    
-    //Local vars
+    //UI vars
     @State private var showNewProject: Bool = false
     @State private var ready: Bool = false
-
-    //Data var
-    @State var projData: ProjectResponse?
 
     var body: some View {
 
         NavigationView {
+            
             List{
+                
                 Section(header: Text("Laufende Projekte")){
-                    if !ready {
-                        Text("Lade Projekte...").italic().foregroundColor(Color.gray)
+                    
+                    if projData!.payload.count == 0{
+                        
+                        Text("Noch keine Projekte").italic().foregroundColor(Color.gray)
                     }
                     else
                     {
-                        ForEach (0 ..< self.projData!.payload.count) {i in
+                        ForEach (projData!.payload.indices) {i in
                             if self.projData!.payload[i].status == 1 {
                                 NavigationLink(destination: ProjectDetailsView(name: self.projData!.payload[i].name,
                                                                                desc: self.projData!.payload[i].description,
                                                                                user: self.projData!.payload[i].users,
-                                                                               tasks: self.projData!.payload[i].tasks)){
+                                                                               tasks: self.projData!.payload[i].tasks,
+                                                                               projectID: self.projData!.payload[i].id,
+                                                                               payloadID: i)){
                                     Text(self.projData!.payload[i].name)
                                 }
                             }
-                        }
-
+                        }.id(UUID())
                     }
                 }
                 
                 Section(header: Text("Abgeschlossene Projekte")){
-                    if !ready {
-                        Text("Lade Projekte...").italic().foregroundColor(Color.gray)
-                    }
-                    else
-                    {
-                        ForEach(0 ..< 1) {i in
-                            if self.projData!.payload[i].status == 2 {
-                                NavigationLink(destination: ProjectDetailsView()) {
-                                    Text("Projekt A")
-                                }
-                            }
-                            else
-                            {
-                                Text("Noch keine abgeschlossenen Projekte").italic().foregroundColor(Color.gray)
-                            }
+                    ForEach (projData!.payload.indices) {i in
+                        if self.projData!.payload[i].status == 2 {
+                            NavigationLink(destination: ProjectDetailsView(name: self.projData!.payload[i].name,
+                                                                           desc: self.projData!.payload[i].description,
+                                                                           user: self.projData!.payload[i].users,
+                                                                           tasks: self.projData!.payload[i].tasks,
+                                                                           projectID: self.projData!.payload[i].id,
+                                                                           payloadID: i)){
+                            Text(self.projData!.payload[i].name)
                         }
-                    }
+                        }
+                    }.id(UUID())
                 }
-
             }
             .listStyle(GroupedListStyle())
             .navigationBarTitle(Text("Projekte"))
@@ -76,17 +72,17 @@ struct ProjectOverviewView: View {
                 ,trailing:
                     Button("Neues Projekt") {
                         self.showNewProject = true
-                    }.sheet(isPresented: $showNewProject){
+                    }.sheet(isPresented: $showNewProject, onDismiss: {self.updateView()}){
                         CreateProjectView(isPresented: self.$showNewProject)
-                    }
-            )
-
-        }.onAppear(){
-            RequestService().getProjects() {data in
-                self.projData = data
-                self.ready.toggle()
-            }
-            
+                    })
+            }.onAppear(){
+                self.updateView()
+        }
+    }
+    
+    func updateView() {
+        RequestService().getProjects() {data in
+            self.projData = data
         }
     }
     

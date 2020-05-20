@@ -16,9 +16,9 @@ struct LogInView: View {
     @State var settingsShown:Bool = false
     
     @State var userData: [Int] = []
+    @State var projData: ProjectResponse?
     @State private var alertShown: Bool = false
     @State private var message: String = ""
-    
     
     var body: some View {
         
@@ -43,7 +43,7 @@ struct LogInView: View {
                             Image(systemName: "person").foregroundColor(.gray)
                             TextField("Benutzername", text: $Username).onTapGesture {
                                 self.Username = ""
-                            }
+                            }.textContentType(.username)
                         }.padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
                             .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
@@ -52,7 +52,7 @@ struct LogInView: View {
                                 Image(systemName: "lock").foregroundColor(.gray)
                                 SecureField("Passwort", text: $Password).onTapGesture {
                                     self.Password = ""
-                                }
+                                }.textContentType(.password)
                             }.padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
                             .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
@@ -63,7 +63,10 @@ struct LogInView: View {
                         self.userData = result
                      
                         if !result.contains(0) {
-                            self.isLoggedIn.toggle()
+                            RequestService().getProjects() {data in
+                                self.projData = data
+                                self.isLoggedIn.toggle()
+                            }
                         }
                         else
                         {
@@ -81,7 +84,9 @@ struct LogInView: View {
             
             if isLoggedIn {
                 if userData[1] == 2 {
-                    ProjectOverviewView(userID: userData[0], isPresented: $isLoggedIn)
+                    ProjectOverviewView(userID: userData[0],
+                                        projData: self.projData,
+                                        isPresented: $isLoggedIn)
                 }
                 if userData[1] == 1 {
                     TaskOverviewView(userID: userData[0], isPresented: $isLoggedIn)

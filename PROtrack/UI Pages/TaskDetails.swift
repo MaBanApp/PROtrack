@@ -10,20 +10,21 @@ import SwiftUI
 
 struct TaskDetailsView: View {
 
-    
+    //Initalizer vars
     @State var name: String = ""
     @State var desc: String = ""
     @State var user: [UserData] = []
     @State var guideTime: String = ""
-    @State var timeRecords: [TimeRecords] = []
     @State var taskID: Int = 0
 
+    //Local vars
+    @State private var timeRecords: [TimeRecords] = []
     
+    //UI Vars
     @State private var showTimeBook:Bool = false
     @State private var showingAlert = false
     @State private var progress: Float = 0
     @State private var isExpanded: Bool = false
-
     
     var body: some View {
         
@@ -42,9 +43,7 @@ struct TaskDetailsView: View {
                     }
                     ProgressBar(value: $progress).frame(height:10)
                 }.frame(height: 70)
-                .onAppear() {
-                    self.progress = progressService().getProgress(guideTime: self.guideTime, bookedTime: self.timeRecords)
-            }
+                
             }
             Section(header: Text("Beschreibung")){
                 ScrollView{
@@ -81,7 +80,7 @@ struct TaskDetailsView: View {
             }
             else
             {
-                ForEach (0..<timeRecords.count) {i in
+                ForEach (timeRecords.indices) {i in
                     VStack (alignment: .leading) {
                         HStack {
                             Text(self.timeRecords[i].date).frame(width: 120, alignment: .leading)
@@ -96,18 +95,16 @@ struct TaskDetailsView: View {
                             Text("Bemerkungen").bold().frame(height: 30, alignment: .leading)
                             Text(self.timeRecords[i].description).frame(alignment: .leading)
                         }
-                    
+                        
                     }.onTapGesture {
                         withAnimation(.linear(duration: 0.2)) {
                             self.isExpanded.toggle()
                         }
-                    
-                        
-                    }
                 }
+
+                }.id(UUID())
             }
         }
-            
             Section(header: Text("Aufgabe verwalten")){
              
                 Button("Aufgabe bearbeiten"){
@@ -120,17 +117,22 @@ struct TaskDetailsView: View {
                                 print("Confirmed")
                         }), secondaryButton: .default(Text("Nein")))}
             }.listStyle(GroupedListStyle())
-            
-            
         }.navigationBarTitle(name)
         .navigationBarItems(trailing:
             Button("Zeit erfassen") {
                 self.showTimeBook = true
-            }.sheet(isPresented: $showTimeBook){
+            }.sheet(isPresented: $showTimeBook, onDismiss: {self.updateView()}){
                 TimeView(taskID: self.taskID, isPresented: self.$showTimeBook)
             }
         )
-
+        .onAppear() {self.updateView()}
+    }
+    
+    func updateView() {
+        RequestService().updateTimeRecords(taskID: self.taskID) {records in
+            self.timeRecords = records
+            self.progress = progressService().getProgress(guideTime: self.guideTime, bookedTime: self.timeRecords)
+        }
     }
     
 }
