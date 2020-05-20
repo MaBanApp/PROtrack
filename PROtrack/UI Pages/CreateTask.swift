@@ -18,7 +18,7 @@ struct CreateTaskView: View {
     @State var GuideTime: String = ""
     
     @State var selectedMembers:[Int] = []
-    @State var ProjectMemberFirstName: [String] = ["Marino", "Robin", "Vladislav"]
+    @State var userData: [UserData] = []
     
     @State private var APIResponse: String = ""
     
@@ -52,7 +52,7 @@ struct CreateTaskView: View {
                 
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        UserCardViewSelectable(SelectedMembers: $selectedMembers, ProjectMember: ["Marino Bantli", "Vladislav Juhasz", "Robin Portner"])
+                        UserCardViewSelectable(SelectedMembers: $selectedMembers)
                     }
                 }
                 

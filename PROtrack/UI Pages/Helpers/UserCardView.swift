@@ -34,33 +34,45 @@ struct UserCardView: View {
 struct UserCardViewSelectable: View {
     
     @Binding var SelectedMembers: [Int]
-        
-    @State var ProjectMember: [String]
+    
+    @State private var ProjectMember: [UserData] = []
+    @State private var ready: Bool = false
 
     var body: some View {
 
         HStack {
-            ForEach(0 ..< ProjectMember.count) {i in
-                VStack {
-                    Group{
-                        Image(systemName: "person.crop.circle").font(.system(size: 40.0)).padding(8)
-                        Text(self.ProjectMember[i]).font(.system(size: 12)).frame(width: 55).fixedSize(horizontal: true, vertical: true).multilineTextAlignment(.center)
-                    }
-                }.frame(width: 60, height: 85)
-                .background(self.SelectedMembers.contains(where: {$0 == i}) ? Color.blue : Color("LightGray"))
-                .cornerRadius(5)
-                .onTapGesture {
-
-                    //Select or unselect Members
-                    if self.SelectedMembers.contains(where: {$0 == i}) {
-                        self.SelectedMembers.remove(at: self.SelectedMembers.firstIndex(where: {$0 == i}) ?? 0)
-                    } else {
-                        self.SelectedMembers.append(i)
-                    }
-
-                }
+            if ready {
+                ForEach(ProjectMember.indices, id: \.self) {i in
+                    VStack {
+                        Group{
+                            Image(systemName: "person.crop.circle").font(.system(size: 40.0)).padding(8)
+                            Text(self.ProjectMember[i].name).font(.system(size: 12)).frame(width: 55).fixedSize(horizontal: true, vertical: true).multilineTextAlignment(.center)
+                        }.onTapGesture {
+                            self.selectUser(id: self.ProjectMember[i].id)
+                        }
+                    }.frame(width: 60, height: 85)
+                    .background(self.SelectedMembers.contains(where: {$0 == self.ProjectMember[i].id}) ? Color.blue : Color("LightGray"))
+                    .cornerRadius(5)
+                }.id(UUID())
             }
-            
+        }.frame(height: 85)
+        .onAppear() {
+            RequestService().getUsers() {data in
+                self.ProjectMember = data
+                self.ready.toggle()
+            }
+        }
+    }
+    
+    func selectUser(id: Int) {
+        if SelectedMembers.contains(id) {
+            self.SelectedMembers.removeAll { $0 == id }
+            print("Remove id: ", id)
+        }
+        else
+        {
+            print("Add id: ", id)
+            self.SelectedMembers.append(id)
         }
     }
 }

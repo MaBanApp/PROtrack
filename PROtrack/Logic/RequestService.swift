@@ -64,6 +64,24 @@ class RequestService {
         }
     }
     
+    //Get a List of all Users registered
+    func getUsers(completion: @escaping ([UserData]) -> Void) {
+        let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
+        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/users?user=" + userID
+         
+        AF.request(url, method: .get).response {response in
+            guard let data = response.data else { return }
+            do {
+                let json = JSON(data)
+                let datapath = try json["payload"].rawData()
+                let data = try JSONDecoder().decode([UserData].self, from: datapath)
+                completion(data)
+            } catch let error {
+                print("API Error: ", error)
+            }
+        }
+    }
+    
     //Update time records for Task
     func updateTimeRecords(taskID: Int, completion: @escaping ([TimeRecords]) -> Void) {
         let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/task/" + String(taskID) + "?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))

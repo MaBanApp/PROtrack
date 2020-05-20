@@ -14,9 +14,6 @@ struct CreateProjectView: View {
     @State var ProjectDescription:String = ""
     @State var selectedMembers:[Int] = []
     
-    @State var ProjectMemberFirstName: [String] = ["Marino", "Robin", "Vladislav"]
-    @State var ProjectMemberLastName: [String] = ["Bantli", "Portner", "Juhasz"]
-    
     @Binding var isPresented: Bool
     @State private var showingAlert: Bool = false
     @State private var APIResponse: String = ""
@@ -38,7 +35,7 @@ struct CreateProjectView: View {
                 
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        UserCardViewSelectable(SelectedMembers: $selectedMembers, ProjectMember: ["Marino Bantli", "Vladislav Juhasz", "Robin Portner"])
+                        UserCardViewSelectable(SelectedMembers: $selectedMembers)
                     }
                 }
 
