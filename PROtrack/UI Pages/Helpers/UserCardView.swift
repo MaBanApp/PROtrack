@@ -67,11 +67,9 @@ struct UserCardViewSelectable: View {
     func selectUser(id: Int) {
         if SelectedMembers.contains(id) {
             self.SelectedMembers.removeAll { $0 == id }
-            print("Remove id: ", id)
         }
         else
         {
-            print("Add id: ", id)
             self.SelectedMembers.append(id)
         }
     }

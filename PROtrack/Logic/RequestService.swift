@@ -11,10 +11,13 @@ import Alamofire
 import SwiftyJSON
 
 class RequestService {
+    
+    let userID: String = String(AppDelegate().settings.integer(forKey: "UserID"))
+    let apiUrl: String = AppDelegate().settings.string(forKey: "ServerURL")!
 
     //Returns array of "UserID" and "Role" and a Message from the API
     func logOn(username: String, password: String, completion: @escaping ([Int], String) -> Void) {
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/authenticate"
+        let url:String = apiUrl + "/authenticate"
         var result:[Int] = []
         
         let params = ["username" : username, "password" : password]
@@ -32,11 +35,8 @@ class RequestService {
     
     //Get a List of all Projects
     func getProjects(completion: @escaping (ProjectResponse) -> Void) {
-        
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/projects?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))
-        
+        let url:String = apiUrl + "/projects?user=" + userID
         AF.request(url, method: .get).response {response in
-                        
             guard let data = response.data else { return }
                 do {
                     let data = try JSONDecoder().decode(ProjectResponse.self, from: data)
@@ -49,9 +49,7 @@ class RequestService {
     
     //Get a List of all Tasks for the specific user
     func getTasks(completion: @escaping (TaskResponse) -> Void) {
-        
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/tasks?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))
-        
+        let url:String = apiUrl + "/tasks?user=" + userID
         AF.request(url, method: .get).response {response in
                         
             guard let data = response.data else { return }
@@ -66,8 +64,7 @@ class RequestService {
     
     //Get a List of all Users registered
     func getUsers(completion: @escaping ([UserData]) -> Void) {
-        let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/users?user=" + userID
+        let url:String = apiUrl + "/users?user=" + userID
          
         AF.request(url, method: .get).response {response in
             guard let data = response.data else { return }
@@ -84,7 +81,7 @@ class RequestService {
     
     //Update time records for Task
     func updateTimeRecords(taskID: Int, completion: @escaping ([TimeRecords]) -> Void) {
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/task/" + String(taskID) + "?user=" + String(AppDelegate().settings.integer(forKey: "UserID"))
+        let url:String = apiUrl + "/task/" + String(taskID) + "?user=" + userID
 
         AF.request(url, method: .get).response {response in
             guard let data = response.data else { return }
@@ -102,20 +99,16 @@ class RequestService {
     
     //Book time on Project
     func bookTime (taskID: Int , time: String, date: String, desc: String, completion: @escaping (Bool, String, Int) -> Void) {
-        let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/task/" + String(taskID) + "/records?user=" + userID
+        let url:String = apiUrl + "/task/" + String(taskID) + "/records?user=" + userID
         let params = ["user" : userID, "date" : date, "time" : time, "description" : desc] as [String : Any]
         
-        print("Request started")
         AF.request(url, method: .post, parameters: params).responseJSON { response in
             
             switch response.result {
                 
             case let.success(data):
                 do {
-                    print(response)
                     let json = JSON(data)
-                    print("JSON parsed")
                     completion(true, json["message"].stringValue, json["status"].intValue)
                 }
                 
@@ -130,8 +123,7 @@ class RequestService {
     
     //Create new task
     func createTask(projectID: Int, title: String, desc: String, guideTime: String, Users: [Int], completion: @escaping (String, Int) -> Void) {
-        let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
-        let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/project/" + String(projectID) + "/tasks?user=" + userID
+        let url:String = apiUrl + "/project/" + String(projectID) + "/tasks?user=" + userID
         let params = ["title" : title, "description" : desc , "guide_time" : guideTime] as [String : Any]
         
         AF.request(url, method: .post, parameters: params).responseJSON {response in
@@ -145,30 +137,39 @@ class RequestService {
     }
     
     //Create new project
-    func createProject(title: String, desc: String, completion: @escaping (String, Int) -> Void) {
-         let userID = String(AppDelegate().settings.integer(forKey: "UserID"))
-         let url:String = AppDelegate().settings.string(forKey: "ServerURL")! + "/projects" + "?user=" + userID
-         let params = ["name" : title, "description" : desc] as [String : Any]
+    func createProject(title: String, desc: String, users: [Int], completion: @escaping (String, Int) -> Void) {
+        let url:String = apiUrl + "/projects" + "?user=" + userID
+        let params = ["name" : title, "description" : desc] as [String : Any]
          
          AF.request(url, method: .post, parameters: params).responseJSON {response in
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    
+                    for i in users.indices {
+                        self.addUserToProject(projectID: json["payload"]["id"].intValue,  user: users[i]) { message, int in
+                            if i == users.count - 1 {
+                                completion(json["message"].stringValue, json["status"].intValue)
+                            }
+                        }
+
+                    }
+                }
+        }
+    }
+    
+    //Add user to a project
+    func addUserToProject(projectID: Int, user: Int, completion: @escaping (String, Int) -> Void) {
+        let url:String = apiUrl + "/project/" + String(projectID) +  "/user/" + String(user) + "?user=" + userID
+        
+         AF.request(url, method: .post).responseJSON {response in
             guard let data = response.data else { return }
                 do {
                     let json = JSON(data)
                     completion(json["message"].stringValue, json["status"].intValue)
                 }
         }
-    }
         
-    func getSelectedUser(firstName: [String], lastName: [String], selected: [Int]) -> [String]{
-        
-        var SelectedUser: [String] = []
-        
-        for i in(0 ..< selected.count) {
-            SelectedUser.append(firstName[selected[i]])
-            SelectedUser.append(lastName[selected[i]])
-        }
-    
-        return SelectedUser
     }
 
 }

@@ -46,7 +46,7 @@ struct CreateProjectView: View {
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
                 Button("Erstellen") {
-                    RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription){ message, status in
+                    RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers){ message, status in
                             if status >= 300 {
                                 self.APIResponse = message
                             }
