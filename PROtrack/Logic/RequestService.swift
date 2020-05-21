@@ -172,4 +172,17 @@ class RequestService {
         
     }
 
+    //Change the Status of the Project or Task, depending on wich ID was given
+    func changeStatus(projectID: Int, taskID: Int, newStatus: Int, completion: @escaping (String, Int) -> Void) {
+        let url:String = apiUrl + "/project/" + String(projectID) +  "/status?user=" + userID
+        let params = ["status" : newStatus] as [String : Any]
+
+        AF.request(url, method: .patch, parameters: params).response {response in
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    completion(json["message"].stringValue, json["status"].intValue)
+            }
+        }
+    }
 }

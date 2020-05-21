@@ -23,6 +23,8 @@ struct ProjectDetailsView: View {
     @State private var Progress: Float = 0.33
     @State private var showNewTask: Bool = false
     @State private var showingAlert = false
+    @State private var alertType: String = ""
+    @State private var APIResponse: String = ""
     
     var body: some View {
         
@@ -90,20 +92,53 @@ struct ProjectDetailsView: View {
                         
             }
             Section(header: Text("Projekt verwalten")){
-            
                 Button("Projekt bearbeiten"){
                     print("edit pressed")
                 }.foregroundColor(Color.blue)
                 Button("Projekt abschliessen"){
-                    self.showingAlert = true
-                }.foregroundColor(Color.red).alert(isPresented: $showingAlert) {
-                    Alert(title: Text("Projekt abschliessen"), message: Text("Sind Sie sicher, dass das Projekt abgeschlossen werden soll ?"), primaryButton: .default(Text("Ja").bold(), action: {
-                                print("Confirmed")
-                        }), secondaryButton: .default(Text("Nein")))}
-                
+                    self.showingAlert.toggle()
+                    self.alertType = "AskIfSure"
+                    
+                }.foregroundColor(Color.red)
             }.listStyle(GroupedListStyle())
             
-        }.navigationBarTitle(name)
+        }.alert(isPresented: $showingAlert) {
+            switch alertType {
+                
+            case "AskIfSure":
+                return Alert(title: Text("Projekt abschliessen"),
+                      message: Text("Sind Sie sicher, dass das Projekt abgeschlossen werden soll ?"),
+                      primaryButton: .default(Text("Ja").bold(), action: {
+                        
+                         RequestService().changeStatus(projectID: self.projectID, taskID: 0, newStatus: 2) { message, status in
+                             self.APIResponse = message
+                             
+                             if status <= 300 {
+                                self.alertType = "Success"
+                                self.showingAlert = true
+                             }
+                             else
+                             {
+                                self.alertType = ""
+                                self.showingAlert = true
+                             }
+                             
+                         }
+                      }),
+                      secondaryButton: .default(Text("Nein")))
+                
+            case "Success":
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                    self.showingAlert.toggle()
+                 }))
+                
+            default:
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                    self.showingAlert.toggle()
+                 }))
+            }
+        }
+        .navigationBarTitle(name)
         .navigationBarItems(trailing:
             Button("Neue Aufgabe") {
                 self.showNewTask = true
