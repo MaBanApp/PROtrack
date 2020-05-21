@@ -16,6 +16,7 @@ struct TaskDetailsView: View {
     @State var user: [UserData] = []
     @State var guideTime: String = ""
     @State var taskID: Int = 0
+    @State var projectID: Int = 0
 
     //Local vars
     @State private var timeRecords: [TimeRecords] = []
@@ -23,8 +24,10 @@ struct TaskDetailsView: View {
     //UI Vars
     @State private var showTimeBook:Bool = false
     @State private var showingAlert = false
+    @State private var alertType: String = ""
     @State private var progress: Float = 0
     @State private var isExpanded: Bool = false
+    @State private var APIResponse: String = ""
     
     var body: some View {
         
@@ -84,7 +87,6 @@ struct TaskDetailsView: View {
                     VStack (alignment: .leading) {
                         HStack {
                             Text(self.timeRecords[i].date).frame(width: 120, alignment: .leading)
-                            //Text("\(self.timeRecords[i].date.timestamp)")
                             Text("\(self.timeRecords[i].time) Minuten").frame(width: 120, alignment: .leading)
                             Text("\(self.timeRecords[i].user.name)").frame(minWidth: 120, alignment: .leading)
                             
@@ -106,18 +108,45 @@ struct TaskDetailsView: View {
             }
         }
             Section(header: Text("Aufgabe verwalten")){
-             
                 Button("Aufgabe bearbeiten"){
-                    print("edit pressed")
-                }.foregroundColor(Color.blue)
+                print("edit pressed")
+            }.foregroundColor(Color.blue)
                 Button("Aufgabe abschliessen"){
+                    self.alertType = "AskIfSure"
                     self.showingAlert = true
-                }.foregroundColor(Color.red).alert(isPresented: $showingAlert) {
-                    Alert(title: Text("Aufgabe abschliessen"), message: Text("Sind Sie sicher, dass die Aufgabe abgeschlossen werden soll ?"), primaryButton: .default(Text("Ja").bold(), action: {
-                                print("Confirmed")
-                        }), secondaryButton: .default(Text("Nein")))}
+                }.foregroundColor(Color.red)
             }.listStyle(GroupedListStyle())
-        }.navigationBarTitle(name)
+        }.alert(isPresented: $showingAlert) {
+            switch alertType {
+            case "AskIfSure":
+                return Alert(title: Text("Aufgabe abschliessen"), message: Text("Sind Sie sicher, dass die Aufgabe abgeschlossen werden soll ?"), primaryButton: .default(Text("Ja").bold(), action: {
+                    RequestService().changeStatus(projectID: self.projectID, taskID: self.taskID, newStatus: 2) {message, status in
+                            self.APIResponse = message
+                            
+                            if status <= 300 {
+                                self.alertType = "Success"
+                                self.showingAlert = true
+                            }
+                            else
+                            {
+                                self.alertType = ""
+                                self.showingAlert = true
+                            }
+                        }
+                    }), secondaryButton: .default(Text("Nein")))
+                
+            case "Success":
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                    self.showingAlert.toggle()
+                }))
+                
+            default:
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                    self.showingAlert.toggle()
+                }))
+            }
+        }
+        .navigationBarTitle(name)
         .navigationBarItems(trailing:
             Button("Zeit erfassen") {
                 self.showTimeBook = true
@@ -126,6 +155,7 @@ struct TaskDetailsView: View {
             }
         )
         .onAppear() {self.updateView()}
+        
     }
     
     func updateView() {

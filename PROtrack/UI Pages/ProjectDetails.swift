@@ -80,16 +80,25 @@ struct ProjectDetailsView: View {
                 else
                 {
                     ForEach (tasks!.indices) {i in
-                        NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
-                                                                    desc: self.tasks![i].description,
-                                                                    guideTime: self.tasks![i].guide_time,
-                                                                    taskID: self.tasks![i].id)){
-                            Text(self.tasks![i].title)
+                        if self.tasks![i].status == 1 {
+                            NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
+                                                                        desc: self.tasks![i].description,
+                                                                        guideTime: self.tasks![i].guide_time,
+                                                                        taskID: self.tasks![i].id,
+                                                                        projectID: self.projectID)){
+                            Text(self.tasks![i].title)}
+                        }
+                        else
+                        {
+                            NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
+                                                                            desc: self.tasks![i].description,
+                                                                            guideTime: self.tasks![i].guide_time,
+                                                                            taskID: self.tasks![i].id,
+                                                                            projectID: self.projectID)){
+                            Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
                         }
                     }.id(UUID())
-                    
                 }
-                        
             }
             Section(header: Text("Projekt verwalten")){
                 Button("Projekt bearbeiten"){
@@ -101,7 +110,6 @@ struct ProjectDetailsView: View {
                     
                 }.foregroundColor(Color.red)
             }.listStyle(GroupedListStyle())
-            
         }.alert(isPresented: $showingAlert) {
             switch alertType {
                 
@@ -145,6 +153,7 @@ struct ProjectDetailsView: View {
             }.sheet(isPresented: $showNewTask, onDismiss: {self.updateView()}){
                 CreateTaskView(projectID: self.projectID, isPresented: self.$showNewTask)
         })
+        .onAppear() {self.updateView()}
     }
     
     func updateView() {
