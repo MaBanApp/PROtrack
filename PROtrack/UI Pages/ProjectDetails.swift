@@ -22,6 +22,7 @@ struct ProjectDetailsView: View {
     //Local vars
     @State private var Progress: Float = 0.33
     @State private var showNewTask: Bool = false
+    @State private var showEditProject: Bool = false
     @State private var showingAlert = false
     @State private var alertType: String = ""
     @State private var APIResponse: String = ""
@@ -102,8 +103,14 @@ struct ProjectDetailsView: View {
             }
             Section(header: Text("Projekt verwalten")){
                 Button("Projekt bearbeiten"){
-                    print("edit pressed")
-                }.foregroundColor(Color.blue)
+                    self.showEditProject.toggle()
+                }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject) {
+                    CreateProjectView(ProjectName: self.name,
+                                      ProjectDescription: self.desc,
+                                      editProject: true,
+                                      projectID: self.projectID,
+                                      isPresented: self.$showEditProject)
+                }
                 Button("Projekt abschliessen"){
                     self.showingAlert.toggle()
                     self.alertType = "AskIfSure"

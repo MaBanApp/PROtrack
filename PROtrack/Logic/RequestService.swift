@@ -192,4 +192,18 @@ class RequestService {
             }
         }
     }
+    
+    //Edit project
+    func editProject (projectID: Int, title: String, desc: String, users: [Int], completion: @escaping (String, Int) -> Void) {
+        let url:String = apiUrl + "/project/" + String(projectID) + "?user=" + userID
+        let params = ["name" : title, "description" : desc]
+        
+        AF.request(url, method: .put, parameters: params).responseJSON {response in
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    completion(json["message"].stringValue, json["status"].intValue)
+                }
+        }
+    }
 }

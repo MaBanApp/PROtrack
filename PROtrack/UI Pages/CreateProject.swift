@@ -13,7 +13,9 @@ struct CreateProjectView: View {
     @State var ProjectName:String = ""
     @State var ProjectDescription:String = ""
     @State var selectedMembers:[Int] = []
-    
+    @State var editProject: Bool = false
+    @State var projectID: Int = 0
+
     @Binding var isPresented: Bool
     @State private var showingAlert: Bool = false
     @State private var APIResponse: String = ""
@@ -21,7 +23,6 @@ struct CreateProjectView: View {
     var body: some View {
         
         NavigationView {
-            
             List{
                 Section(header: Text("Projektname")){
                     TextField("Projektname", text: $ProjectName)
@@ -39,14 +40,26 @@ struct CreateProjectView: View {
                     }
                 }
 
-
-            }.navigationBarTitle(Text("Neues Projekt erstellen"), displayMode: .inline)
+            }.navigationBarTitle(self.editProject ? Text("Projekt editieren") : Text("Neues Projekt erstellen"), displayMode: .inline)
             .navigationBarItems(
                 leading:
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
-                Button("Erstellen") {
-                    RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers){ message, status in
+                Button(self.editProject ? "Aktualisieren" : "Erstellen") {
+                    if self.editProject {
+                        RequestService().editProject(projectID: self.projectID, title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers) {message, status in
+                        if status >= 300 {
+                            self.APIResponse = message
+                        }
+                        if status <= 300 {
+                            self.APIResponse = message
+                            self.showingAlert.toggle()
+                        }
+                    }
+                    }
+                    else
+                    {
+                        RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers){ message, status in
                             if status >= 300 {
                                 self.APIResponse = message
                             }
@@ -55,15 +68,15 @@ struct CreateProjectView: View {
                                 self.showingAlert.toggle()
                             }
                         }
+                    }
+                    
                 })
             .listStyle(GroupedListStyle())
-
-
             }.alert(isPresented: self.$showingAlert) {
-                Alert(title: Text("Projekt erstellt"), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                Alert(title: Text(""), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
                     self.isPresented.toggle()
             }))}
             .navigationViewStyle(StackNavigationViewStyle())
-
+        
     }
 }
