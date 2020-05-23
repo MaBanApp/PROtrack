@@ -31,7 +31,7 @@ struct ProjectOverviewView: View {
                     {
                         ForEach (projData!.payload.indices) {i in
                             if self.projData!.payload[i].status == 1 {
-                                NavigationLink(destination: ProjectDetailsView(projectID: self.projData!.payload[i].id, payloadID: i)){
+                                NavigationLink(destination: ProjectDetailsView(projectID: self.projData!.payload[i].id, payloadID: i, isFinished: false)){
                                     Text(self.projData!.payload[i].name)
                                 }
                             }
@@ -46,7 +46,7 @@ struct ProjectOverviewView: View {
                     {
                         ForEach (projData!.payload.indices) {i in
                             if self.projData!.payload[i].status == 2 {
-                                NavigationLink(destination: ProjectDetailsView(projectID: self.projData!.payload[i].id, payloadID: i)){
+                                NavigationLink(destination: ProjectDetailsView(projectID: self.projData!.payload[i].id, payloadID: i, isFinished: true)){
                                     Text(self.projData!.payload[i].name)
                                 }
                             }

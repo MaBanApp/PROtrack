@@ -13,6 +13,7 @@ struct ProjectDetailsView: View {
     //Initalizer vars
     @State var projectID                : Int
     @State var payloadID                : Int
+    @State var isFinished               : Bool
     
     //Data vars
     @State private var name             : String = "Lade Projekt..."
@@ -76,75 +77,84 @@ struct ProjectDetailsView: View {
                         ForEach (tasks!.indices) {i in
                             if self.tasks![i].status == 1 {
                                 NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
-                                                                            projectID: self.projectID)){
+                                                                            projectID: self.projectID,
+                                                                            isFinished: false)){
                                 Text(self.tasks![i].title)}
                             }
                             else
                             {
                                 NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
-                                                                            projectID: self.projectID)){
-                                Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
+                                                                            projectID: self.projectID,
+                                                                            isFinished: true)){
+                                    HStack {
+                                        Text(self.tasks![i].title).italic()
+                                        Spacer()
+                                        Text("Abgeschlossen").italic().foregroundColor(Color.gray)
+                                    }
+                                }
                             }
                         }.id(UUID())
                     }
                 }
             }
-            Section(header: Text("Projekt verwalten")){
-                Button("Projekt bearbeiten"){
-                    self.showEditProject.toggle()
-                }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject, onDismiss: {self.updateView()}) {
-                    CreateProjectView(ProjectName: self.name,
-                                      ProjectDescription: self.desc,
-                                      editProject: true,
-                                      projectID: self.projectID,
-                                      isPresented: self.$showEditProject)
-                }
-                Button("Projekt abschliessen"){
-                    self.showingAlert.toggle()
-                    self.alertType = "AskIfSure"
-                    
-                }.foregroundColor(Color.red)
-            }.listStyle(GroupedListStyle())
-        }
-        .alert(isPresented: $showingAlert) {
-            switch alertType {
-                
-            case "AskIfSure":
-                return Alert(title: Text("Projekt abschliessen"),
-                      message: Text("Sind Sie sicher, dass das Projekt abgeschlossen werden soll ?"),
-                      primaryButton: .default(Text("Ja").bold(), action: {
+            if !isFinished {
+                Section(header: Text("Projekt verwalten")){
+                    Button("Projekt bearbeiten"){
+                        self.showEditProject.toggle()
+                    }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject, onDismiss: {self.updateView()}) {
+                        CreateProjectView(ProjectName: self.name,
+                                          ProjectDescription: self.desc,
+                                          editProject: true,
+                                          projectID: self.projectID,
+                                          isPresented: self.$showEditProject)
+                    }
+                    Button("Projekt abschliessen"){
+                        self.showingAlert.toggle()
+                        self.alertType = "AskIfSure"
                         
-                         RequestService().changeStatus(projectID: self.projectID, taskID: 0, newStatus: 2) { message, status in
-                             self.APIResponse = message
-                             
-                             if status <= 300 {
-                                self.alertType = "Success"
-                                self.showingAlert = true
-                             }
-                             else
-                             {
-                                self.alertType = ""
-                                self.showingAlert = true
-                             }
-                             
-                         }
-                      }),
-                      secondaryButton: .default(Text("Nein")))
-                
-            case "Success":
-                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
-                    self.showingAlert.toggle()
-                 }))
-                
-            default:
-                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
-                    self.showingAlert.toggle()
-                 }))
+                    }.foregroundColor(Color.red)
+                }
             }
+        }.listStyle(GroupedListStyle())
+        .alert(isPresented: $showingAlert) {
+        switch alertType {
+            
+        case "AskIfSure":
+            return Alert(title: Text("Projekt abschliessen"),
+                    message: Text("Sind Sie sicher, dass das Projekt abgeschlossen werden soll ?"),
+                    primaryButton: .default(Text("Ja").bold(), action: {
+                    
+                        RequestService().changeStatus(projectID: self.projectID, taskID: 0, newStatus: 2) { message, status in
+                            self.APIResponse = message
+                            
+                            if status <= 300 {
+                            self.alertType = "Success"
+                            self.showingAlert = true
+                            }
+                            else
+                            {
+                            self.alertType = ""
+                            self.showingAlert = true
+                            }
+                            
+                        }
+                    }),
+                    secondaryButton: .default(Text("Nein")))
+            
+        case "Success":
+            return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                self.showingAlert.toggle()
+                }))
+            
+        default:
+            return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action: {
+                self.showingAlert.toggle()
+                }))
         }
+    }
         .navigationBarTitle(Text(name), displayMode: .inline)
         .navigationBarItems(trailing:
-            Button("Neue Aufgabe") {
+            Button(self.isFinished ? "" : "Neue Aufgabe") {
                 self.showNewTask = true
             }.sheet(isPresented: $showNewTask, onDismiss: {self.updateView()}){
                 CreateTaskView(projectID: self.projectID, isPresented: self.$showNewTask)

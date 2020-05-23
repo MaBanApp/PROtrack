@@ -21,6 +21,7 @@ struct CreateProjectView: View {
     @Binding var isPresented            : Bool
     @State private var showingAlert     : Bool = false
     @State private var APIResponse      : String = ""
+    @State private var alertType        : String = ""
         
     var body: some View {
         NavigationView {
@@ -44,14 +45,16 @@ struct CreateProjectView: View {
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
                 Button(self.editProject ? "Aktualisieren" : "Erstellen") {
-                    if self.editProject {
-                        print("aktualisiere")
-
+                    if self.editProject
+                    {
                         RequestService().editProject(projectID: self.projectID, title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers) {message, status in
                             if status >= 300 {
+                                self.alertType = "Error"
                                 self.APIResponse = message
+                                self.showingAlert.toggle()
                             }
                             if status <= 300 {
+                                self.alertType = "Success"
                                 self.APIResponse = message
                                 self.showingAlert.toggle()
                             }
@@ -61,10 +64,12 @@ struct CreateProjectView: View {
                     {
                         RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers){ message, status in
                             if status >= 300 {
-                                print(message)
+                                self.alertType = "Error"
                                 self.APIResponse = message
+                                self.showingAlert.toggle()
                             }
                             if status <= 300 {
+                                self.alertType = "Success"
                                 self.APIResponse = message
                                 self.showingAlert.toggle()
                             }
@@ -73,10 +78,23 @@ struct CreateProjectView: View {
                     
                 })
             .listStyle(GroupedListStyle())
-            }.alert(isPresented: self.$showingAlert) {
-                Alert(title: Text(""), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
-                    self.isPresented.toggle()
-            }))}
+            }.alert(isPresented: $showingAlert) {
+                switch alertType {
+                case "Error":
+                    return Alert(title: Text("Fehler!"), message: Text(APIResponse), dismissButton: .default(Text("OK").bold()))
+                    
+                case "Success":
+                    return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                        self.showingAlert.toggle()
+                        self.isPresented.toggle()
+                    }))
+                    
+                default:
+                    return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                        self.showingAlert.toggle()
+                    }))
+                }
+            }
             .navigationViewStyle(StackNavigationViewStyle())
     }
 }

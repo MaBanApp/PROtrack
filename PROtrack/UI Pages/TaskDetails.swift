@@ -13,6 +13,7 @@ struct TaskDetailsView: View {
     //Initalizer vars
     @State var taskID                   : Int = 0
     @State var projectID                : Int = 0
+    @State var isFinished               : Bool = false
 
     //Data vars
     @State private var name             : String = "Lade Aufgabe..."
@@ -98,18 +99,20 @@ struct TaskDetailsView: View {
                 }.id(UUID())
             }
         }
-            Section(header: Text("Aufgabe verwalten")){
-                Button("Aufgabe bearbeiten"){
-                    self.showEditTask.toggle()
-                }.foregroundColor(Color.blue).sheet(isPresented: $showEditTask, onDismiss: {self.updateView()}) {
-                    CreateTaskView(TaskID: self.taskID, TaskName: self.name, TaskDescription: self.desc, GuideTime: String(self.guideTime), editTask: true, isPresented: self.$showEditTask)
+            if !isFinished {
+                Section(header: Text("Aufgabe verwalten")){
+                    Button("Aufgabe bearbeiten"){
+                        self.showEditTask.toggle()
+                    }.foregroundColor(Color.blue).sheet(isPresented: $showEditTask, onDismiss: {self.updateView()}) {
+                        CreateTaskView(TaskID: self.taskID, TaskName: self.name, TaskDescription: self.desc, GuideTime: String(self.guideTime), editTask: true, isPresented: self.$showEditTask)
+                    }
+                    Button("Aufgabe abschliessen"){
+                        self.alertType = "AskIfSure"
+                        self.showingAlert = true
+                    }.foregroundColor(Color.red)
                 }
-                Button("Aufgabe abschliessen"){
-                    self.alertType = "AskIfSure"
-                    self.showingAlert = true
-                }.foregroundColor(Color.red)
-            }.listStyle(GroupedListStyle())
-        }
+            }
+        }.listStyle(GroupedListStyle())
         .alert(isPresented: $showingAlert) {
             switch alertType {
             case "AskIfSure":
@@ -142,7 +145,7 @@ struct TaskDetailsView: View {
         }
         .navigationBarTitle(Text(name), displayMode: .inline)
         .navigationBarItems(trailing:
-            Button("Zeit erfassen") {
+            Button(self.isFinished ? "" : "Zeit erfassen") {
                 self.showTimeBook = true
             }.sheet(isPresented: $showTimeBook, onDismiss: {self.updateView()}){
                 TimeView(taskID: self.taskID, isPresented: self.$showTimeBook)

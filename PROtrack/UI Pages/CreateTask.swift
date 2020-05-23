@@ -14,7 +14,7 @@ struct CreateTaskView: View {
     @State var TaskID                   : Int = 0
     @State var projectID                : Int = 0
     @State var TaskName                 : String = ""
-    @State var TaskDescription          : String = "Keine Beschreibung"
+    @State var TaskDescription          : String = ""
     @State var GuideTime                : String = ""
     @State var editTask                 : Bool = false
     @State var selectedMembers          : [Int] = []
@@ -24,6 +24,7 @@ struct CreateTaskView: View {
     @Binding var isPresented            : Bool
     @State private var showingAlert     : Bool = false
     @State private var APIResponse      : String = ""
+    @State private var alertType        : String = ""
 
     
     var body: some View {     
@@ -58,10 +59,12 @@ struct CreateTaskView: View {
                 if self.editTask {
                     RequestService().editTask(taskID: self.TaskID, title: self.TaskName, desc: self.TaskDescription, guideTime: Int(self.GuideTime) ?? 0) { message, status in
                         if status >= 300 {
+                            self.alertType = "Error"
                             self.APIResponse = message
-                            debugPrint(message)
+                            self.showingAlert.toggle()
                         }
                         if status <= 300 {
+                            self.alertType = "Success"
                             self.APIResponse = message
                             self.showingAlert.toggle()
                         }
@@ -74,10 +77,12 @@ struct CreateTaskView: View {
                                                 guideTime: self.GuideTime,
                                                 Users: self.selectedMembers) { message, status in
                         if status >= 300 {
+                            self.alertType = "Error"
                             self.APIResponse = message
-                            debugPrint(message)
+                            self.showingAlert.toggle()
                         }
                         if status <= 300 {
+                            self.alertType = "Success"
                             self.APIResponse = message
                             self.showingAlert.toggle()
                         }
@@ -86,10 +91,23 @@ struct CreateTaskView: View {
                 }
             })
             .listStyle(GroupedListStyle())
-        }.alert(isPresented: self.$showingAlert) {
-            Alert(title: Text(""), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
-                self.isPresented.toggle()
-        }))}
+        }.alert(isPresented: $showingAlert) {
+            switch alertType {
+            case "Error":
+                return Alert(title: Text("Fehler!"), message: Text(APIResponse), dismissButton: .default(Text("OK").bold()))
+                
+            case "Success":
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                    self.showingAlert.toggle()
+                    self.isPresented.toggle()
+                }))
+                
+            default:
+                return Alert(title: Text(""), message: Text(APIResponse), dismissButton: .default(Text("OK").bold(), action:{
+                    self.showingAlert.toggle()
+                }))
+            }
+        }
         .navigationViewStyle(StackNavigationViewStyle())
     }
 }
