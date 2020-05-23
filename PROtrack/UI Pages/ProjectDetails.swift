@@ -142,7 +142,7 @@ struct ProjectDetailsView: View {
                  }))
             }
         }
-        .navigationBarTitle(Text(name))
+        .navigationBarTitle(Text(name), displayMode: .inline)
         .navigationBarItems(trailing:
             Button("Neue Aufgabe") {
                 self.showNewTask = true

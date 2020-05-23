@@ -23,8 +23,10 @@ struct TaskDetailsView: View {
     @State private var timeRecords      : [TimeRecords] = []
     
     //UI Vars
+    @State private var ready            : Bool = false
     @State private var showTimeBook     : Bool = false
     @State private var showingAlert     = false
+    @State private var showEditTask     : Bool = false
     @State private var alertType        : String = ""
     @State private var isExpanded       : Bool = false
     @State private var APIResponse      : String = ""
@@ -35,21 +37,24 @@ struct TaskDetailsView: View {
                 ProgressView(guideTime: $guideTime, bookedTime: $bookedTime)
             }
             Section(header: Text("Beschreibung")){
-                ScrollView{
-                    Text(desc)
-                }.frame(height:145)
+                if ready {
+                    ScrollView{
+                        Text(desc)
+                    }.frame(height:145)
+                }
             }
             Section(header: Text("Beteiligte")){
-                ScrollView(.horizontal) {
-                    if self.user.count == 0 {
-                        Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
-                    }
-                    else
-                    {
-                        UserCardView(ProjectMember: self.user)
-                    }
-                }.frame(height:86, alignment: .top)
-
+                if ready {
+                    ScrollView(.horizontal) {
+                        if self.user.count == 0 {
+                            Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
+                        }
+                        else
+                        {
+                            UserCardView(ProjectMember: self.user)
+                        }
+                    }.frame(height:86, alignment: .top)
+                }
             }
             Section(header: VStack(alignment: .leading){
                 VStack(alignment: .leading) {
@@ -95,8 +100,10 @@ struct TaskDetailsView: View {
         }
             Section(header: Text("Aufgabe verwalten")){
                 Button("Aufgabe bearbeiten"){
-                print("edit pressed")
-            }.foregroundColor(Color.blue)
+                    self.showEditTask.toggle()
+                }.foregroundColor(Color.blue).sheet(isPresented: $showEditTask, onDismiss: {self.updateView()}) {
+                    CreateTaskView(TaskID: self.taskID, TaskName: self.name, TaskDescription: self.desc, GuideTime: String(self.guideTime), editTask: true, isPresented: self.$showEditTask)
+                }
                 Button("Aufgabe abschliessen"){
                     self.alertType = "AskIfSure"
                     self.showingAlert = true
@@ -133,7 +140,7 @@ struct TaskDetailsView: View {
                 }))
             }
         }
-        .navigationBarTitle(Text(name))
+        .navigationBarTitle(Text(name), displayMode: .inline)
         .navigationBarItems(trailing:
             Button("Zeit erfassen") {
                 self.showTimeBook = true
@@ -158,6 +165,7 @@ extension TaskDetailsView {
             self.guideTime = data.guide_time
             self.bookedTime = progressService().getTotalBookedTime(timeRecords: [data])
             self.timeRecords = data.records
+            self.ready = true
         }
     }
     

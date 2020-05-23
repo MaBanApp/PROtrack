@@ -11,11 +11,12 @@ import SwiftUI
 struct CreateTaskView: View {
     
     //Initalizer vars
+    @State var TaskID                   : Int = 0
     @State var projectID                : Int = 0
     @State var TaskName                 : String = ""
-    @State var TaskDescription          : String = ""
+    @State var TaskDescription          : String = "Keine Beschreibung"
     @State var GuideTime                : String = ""
-    
+    @State var editTask                 : Bool = false
     @State var selectedMembers          : [Int] = []
     @State var userData                 : [UserData] = []
         
@@ -33,7 +34,7 @@ struct CreateTaskView: View {
                 }
                 Section(header: Text("Beschreibung")) {
                     ScrollView {
-                        TextField("Beschreibung", text: $TaskDescription)
+                        TextField("", text: $TaskDescription)
                     }.frame(height:120)
                 }
                 Section(header: Text("Richtzeit")) {
@@ -48,25 +49,40 @@ struct CreateTaskView: View {
                         UserCardViewSelectable(SelectedMembers: $selectedMembers, projectID: self.projectID)
                     }
                 }
-            }.navigationBarTitle(Text("Neue Aufgabe erstellen"), displayMode: .inline)
+            }.navigationBarTitle(self.editTask ? Text("Aufgabe editieren") : Text("Neue Aufgabe erstellen"), displayMode: .inline)
             .navigationBarItems(
                 leading:
                 Button("Abbrechen") { self.isPresented = false}
                 , trailing:
-               Button("Erstellen") {
-                RequestService().createTask(projectID: self.projectID,
-                                            title: self.TaskName,
-                                            desc: self.TaskDescription,
-                                            guideTime: self.GuideTime,
-                                            Users: self.selectedMembers) { message, status in
-                    if status >= 300 {
-                        self.APIResponse = message
+               Button(self.editTask ? "Aktualisieren" : "Erstellen") {
+                if self.editTask {
+                    RequestService().editTask(taskID: self.TaskID, title: self.TaskName, desc: self.TaskDescription, guideTime: Int(self.GuideTime) ?? 0) { message, status in
+                        if status >= 300 {
+                            self.APIResponse = message
+                            debugPrint(message)
+                        }
+                        if status <= 300 {
+                            self.APIResponse = message
+                            self.showingAlert.toggle()
+                        }
                     }
-                    if status <= 300 {
-                        self.APIResponse = message
-                        self.showingAlert.toggle()
-                    }
+                }
+                if !self.editTask {
+                    RequestService().createTask(projectID: self.projectID,
+                                                title: self.TaskName,
+                                                desc: self.TaskDescription,
+                                                guideTime: self.GuideTime,
+                                                Users: self.selectedMembers) { message, status in
+                        if status >= 300 {
+                            self.APIResponse = message
+                            debugPrint(message)
+                        }
+                        if status <= 300 {
+                            self.APIResponse = message
+                            self.showingAlert.toggle()
+                        }
 
+                    }
                 }
             })
             .listStyle(GroupedListStyle())

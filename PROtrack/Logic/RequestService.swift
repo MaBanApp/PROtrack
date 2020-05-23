@@ -47,6 +47,7 @@ class RequestService {
         }
     }
     
+    //Get the projectinformations by ID
     func getProjectById(projectID: Int, completion: @escaping (ProjectPayload) -> Void) {
         let url:String = apiUrl + "/project/" + String(projectID) + "?user=" + userID
         
@@ -264,5 +265,19 @@ class RequestService {
                 }
         }
     }
-    
+
+    //Edit task
+    func editTask (taskID: Int, title: String, desc: String, guideTime: Int, completion: @escaping (String, Int) -> Void) {
+        let url:String = apiUrl + "/task/" + String(taskID) + "?user=" + userID
+        let params = ["title" : title, "description" : desc, "guide_time" : guideTime] as [String : Any]
+        
+        AF.request(url, method: .put, parameters: params).responseJSON {response in
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    completion(json["message"].stringValue, json["status"].intValue)
+                }
+        }
+    }
+
 }
