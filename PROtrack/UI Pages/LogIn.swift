@@ -59,19 +59,26 @@ struct LogInView: View {
                         Spacer().frame(height: 20)
                     }
                 Button(action: {
-                    RequestService().logOn(username: self.Username, password: self.Password) {result, message in
-                        self.userData = result
-                     
-                        if !result.contains(0) {
-                            RequestService().getProjects() {data in
-                                self.projData = data
-                                self.isLoggedIn.toggle()
+                    if AppDelegate().settings.string(forKey: "ServerURL") == nil {
+                        self.message = "Keine Serveradresse angegeben"
+                        self.alertShown.toggle()
+                    }
+                    else
+                    {
+                        RequestService().logOn(username: self.Username, password: self.Password) {result, message in
+                            self.userData = result
+                         
+                            if !result.contains(0) {
+                                RequestService().getProjects() {data in
+                                    self.projData = data
+                                    self.isLoggedIn.toggle()
+                                }
                             }
-                        }
-                        else
-                        {
-                            self.message = message
-                            self.alertShown.toggle()
+                            else
+                            {
+                                self.message = message
+                                self.alertShown.toggle()
+                            }
                         }
                     }
                     self.endEditing()

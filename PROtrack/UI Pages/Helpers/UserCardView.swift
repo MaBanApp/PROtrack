@@ -10,16 +10,16 @@ import SwiftUI
 
 struct UserCardView: View {
     
-    @State var ProjectMember: [String]
+    @State var ProjectMember: [UserData]
     
     var body: some View {
 
         HStack {
-            ForEach(0 ..< ProjectMember.count) {i in
+            ForEach(ProjectMember.indices) {i in
                 VStack {
                     Group{
                         Image(systemName: "person.crop.circle").font(.system(size: 40.0)).padding(8)
-                        Text(self.ProjectMember[i]).font(.system(size: 12)).frame(width: 55).fixedSize(horizontal: true, vertical: true).multilineTextAlignment(.center)
+                        Text(self.ProjectMember[i].name).font(.system(size: 12)).frame(width: 55).fixedSize(horizontal: true, vertical: true).multilineTextAlignment(.center)
                     }
                 }.frame(width: 60, height: 85)
                 .background(Color("LightGray"))
@@ -34,6 +34,7 @@ struct UserCardView: View {
 struct UserCardViewSelectable: View {
     
     @Binding var SelectedMembers: [Int]
+    @State var projectID: Int = 0
     
     @State private var ProjectMember: [UserData] = []
     @State private var ready: Bool = false
@@ -57,7 +58,7 @@ struct UserCardViewSelectable: View {
             }
         }.frame(height: 85)
         .onAppear() {
-            RequestService().getUsers() {data in
+            RequestService().getUsers(projectID: self.projectID) {data in
                 self.ProjectMember = data
                 self.ready.toggle()
             }
@@ -72,11 +73,5 @@ struct UserCardViewSelectable: View {
         {
             self.SelectedMembers.append(id)
         }
-    }
-}
-
-struct UserCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        UserCardView(ProjectMember: ["Marino Bantli", "Vladislav Juhasz", "Robin Portner"])
     }
 }

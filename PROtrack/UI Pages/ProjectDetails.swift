@@ -11,113 +11,103 @@ import SwiftUI
 struct ProjectDetailsView: View {
 
     //Initalizer vars
-    @State var name: String = ""
-    @State var desc: String = ""
-    @State var user: [UserData]?
-    @State var tasks:[TaskPayload]?
-    @State var projectID: Int = 0
-    @State var payloadID: Int = 0
+    @State var projectID                : Int
+    @State var payloadID                : Int
     
-    
-    //Local vars
-    @State private var Progress: Float = 0.33
-    @State private var showNewTask: Bool = false
-    @State private var showEditProject: Bool = false
-    @State private var showingAlert = false
-    @State private var alertType: String = ""
-    @State private var APIResponse: String = ""
+    //Data Vars
+    @State private var name             : String = "Lade Projekt..."
+    @State private var desc             : String = ""
+    @State private var user             : [UserData]?
+    @State private var tasks            : [TaskPayload]?
+    @State private var guideTime        : Int = 0
+    @State private var bookedTime       : Int = 0
+
+    //UI vars
+    @State private var ready            : Bool = false
+    @State private var showNewTask      : Bool = false
+    @State private var showEditProject  : Bool = false
+    @State private var showingAlert     : Bool = false
+    @State private var alertType        : String = ""
+    @State private var APIResponse      : String = ""
     
     var body: some View {
         
         List{
-            Section(header: Text("Projektfortschritt")){
-                VStack{
-                    HStack{
-                        Text("Richtzeit:")
-                        Spacer()
-                        Text("\(progressService().getTotalGuideTime(timeRecords: self.tasks!)) Minuten")
-                    }
-                    HStack {
-                        Text("Verbuchte Zeit:")
-                        Spacer()
-                        Text("\(progressService().getTotalBookedTime(timeRecords: self.tasks!)) Minuten")
-                    }
-                    ProgressBar(value: $Progress).frame(height:10)
-                }.frame(height: 70)
-                .onAppear() {
-                    let totalGuideTime:Int = Int(progressService().getTotalGuideTime(timeRecords: self.tasks!))!
-                    let totalBookedTime: Int = Int(progressService().getTotalBookedTime(timeRecords: self.tasks!))!
-                    if totalGuideTime >= 1 {
-                        self.Progress = Float(totalBookedTime) / Float(totalGuideTime)
-                    }
-                    else
-                    {
-                        self.Progress = 0
-                    }
+                Section(header: Text("Projektfortschritt")){
+                    ProgressView(guideTime: $guideTime, bookedTime: $bookedTime)
                 }
-            }
-            Section(header: Text("Beschreibung")){
-                ScrollView{
-                    Text(desc)
-                }.frame(height:145)
-            }
-            Section(header: Text("Beteiligte")){
-                ScrollView(.horizontal) {
-                    if self.user!.count == 0 {
-                        Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
+                Section(header: Text("Beschreibung")){
+                    if ready {
+                        ScrollView{
+                            Text(desc)
+                        }.frame(height:145)
                     }
                     else
                     {
-                        //UserCardView
+                        ScrollView {
+                            Text("Wird geladen...").italic().foregroundColor(Color.gray)
+                        }.frame(height:145)
                     }
-                }.frame(height:86, alignment: .top)
 
-            }
-            Section(header: Text("Projektaufgaben")){
-                
-                if tasks?.count == 0{
-                    Text("Noch keine Aufgaben hinzugefügt").italic().foregroundColor(Color.gray)
                 }
-                else
-                {
-                    ForEach (tasks!.indices) {i in
-                        if self.tasks![i].status == 1 {
-                            NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
-                                                                        desc: self.tasks![i].description,
-                                                                        guideTime: self.tasks![i].guide_time,
-                                                                        taskID: self.tasks![i].id,
-                                                                        projectID: self.projectID)){
-                            Text(self.tasks![i].title)}
+                Section(header: Text("Beteiligte")){
+                    if ready {
+                        ScrollView(.horizontal) {
+                            if self.user!.count == 0 {
+                                Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
+                            }
+                            else
+                            {
+                                UserCardView(ProjectMember: self.user!)
+                            }
+                        }.frame(height:86, alignment: .top)
+                    }
+                    else
+                    {
+                        Text("Wird geladen...").italic().foregroundColor(Color.gray).frame(height: 86)
+                    }
+                }
+                Section(header: Text("Projektaufgaben")){
+                    if ready {
+                        if tasks?.count == 0{
+                            Text("Noch keine Aufgaben hinzugefügt").italic().foregroundColor(Color.gray)
                         }
                         else
                         {
-                            NavigationLink(destination: TaskDetailsView(name: self.tasks![i].title,
-                                                                            desc: self.tasks![i].description,
-                                                                            guideTime: self.tasks![i].guide_time,
-                                                                            taskID: self.tasks![i].id,
-                                                                            projectID: self.projectID)){
-                            Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
+                            ForEach (tasks!.indices) {i in
+                                if self.tasks![i].status == 1 {
+                                    NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
+                                                                                projectID: self.projectID)){
+                                    Text(self.tasks![i].title)}
+                                }
+                                else
+                                {
+                                    NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
+                                                                                projectID: self.projectID)){
+                                    Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
+                                }
+                            }.id(UUID())
                         }
-                    }.id(UUID())
+                    }
                 }
-            }
-            Section(header: Text("Projekt verwalten")){
-                Button("Projekt bearbeiten"){
-                    self.showEditProject.toggle()
-                }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject) {
-                    CreateProjectView(ProjectName: self.name,
-                                      ProjectDescription: self.desc,
-                                      editProject: true,
-                                      projectID: self.projectID,
-                                      isPresented: self.$showEditProject)
-                }
-                Button("Projekt abschliessen"){
-                    self.showingAlert.toggle()
-                    self.alertType = "AskIfSure"
-                    
-                }.foregroundColor(Color.red)
-            }.listStyle(GroupedListStyle())
-        }.alert(isPresented: $showingAlert) {
+                Section(header: Text("Projekt verwalten")){
+                    Button("Projekt bearbeiten"){
+                        self.showEditProject.toggle()
+                    }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject, onDismiss: {self.updateView()}) {
+                        CreateProjectView(ProjectName: self.name,
+                                          ProjectDescription: self.desc,
+                                          editProject: true,
+                                          projectID: self.projectID,
+                                          isPresented: self.$showEditProject)
+                    }
+                    Button("Projekt abschliessen"){
+                        self.showingAlert.toggle()
+                        self.alertType = "AskIfSure"
+                        
+                    }.foregroundColor(Color.red)
+                }.listStyle(GroupedListStyle())
+        }
+        .alert(isPresented: $showingAlert) {
             switch alertType {
                 
             case "AskIfSure":
@@ -153,26 +143,27 @@ struct ProjectDetailsView: View {
                  }))
             }
         }
-        .navigationBarTitle(name)
+        .navigationBarTitle(Text(name))
         .navigationBarItems(trailing:
             Button("Neue Aufgabe") {
                 self.showNewTask = true
             }.sheet(isPresented: $showNewTask, onDismiss: {self.updateView()}){
                 CreateTaskView(projectID: self.projectID, isPresented: self.$showNewTask)
         })
-        .onAppear() {self.updateView()}
+        .onAppear() {
+            self.updateView()}
     }
     
     func updateView() {
         RequestService().getProjects() { data in
+            self.name = data.payload[self.payloadID].name
+            self.desc = data.payload[self.payloadID].description
+            self.user = data.payload[self.payloadID].users
             self.tasks = data.payload[self.payloadID].tasks
+            self.guideTime = progressService().getTotalGuideTime(timeRecords: data.payload[self.payloadID].tasks)
+            self.bookedTime = progressService().getTotalBookedTime(timeRecords: data.payload[self.payloadID].tasks)
+            self.ready = true
         }
     }
 
-}
-
-struct ProjectDetailsView_Preview: PreviewProvider {
-    static var previews: some View {
-        ProjectDetailsView()
-    }
 }

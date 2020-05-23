@@ -11,42 +11,28 @@ import SwiftUI
 struct TaskDetailsView: View {
 
     //Initalizer vars
-    @State var name: String = ""
-    @State var desc: String = ""
-    @State var user: [UserData] = []
-    @State var guideTime: String = ""
     @State var taskID: Int = 0
     @State var projectID: Int = 0
 
-    //Local vars
+    //Data vars
+    @State private var name: String = "Lade Aufgabe..."
+    @State private var desc: String = ""
+    @State private var user: [UserData] = []
+    @State private var guideTime: Int = 0
+    @State private var bookedTime: Int = 0
     @State private var timeRecords: [TimeRecords] = []
     
     //UI Vars
     @State private var showTimeBook:Bool = false
     @State private var showingAlert = false
     @State private var alertType: String = ""
-    @State private var progress: Float = 0
     @State private var isExpanded: Bool = false
     @State private var APIResponse: String = ""
     
     var body: some View {
-        
         List{
             Section(header: Text("Aufgabenfortschritt")){
-                VStack{
-                    HStack{
-                        Text("Richtzeit:")
-                        Spacer()
-                        Text("\(guideTime) Minuten")
-                    }
-                    HStack {
-                        Text("Verbuchte Zeit:")
-                        Spacer()
-                        Text(progressService().getBookedTime(bookedTime: timeRecords))
-                    }
-                    ProgressBar(value: $progress).frame(height:10)
-                }.frame(height: 70)
-                
+                ProgressView(guideTime: $guideTime, bookedTime: $bookedTime)
             }
             Section(header: Text("Beschreibung")){
                 ScrollView{
@@ -60,7 +46,7 @@ struct TaskDetailsView: View {
                     }
                     else
                     {
-                        UserCardView(ProjectMember: ["user"] )
+                        UserCardView(ProjectMember: self.user)
                     }
                 }.frame(height:86, alignment: .top)
 
@@ -116,7 +102,8 @@ struct TaskDetailsView: View {
                     self.showingAlert = true
                 }.foregroundColor(Color.red)
             }.listStyle(GroupedListStyle())
-        }.alert(isPresented: $showingAlert) {
+        }
+        .alert(isPresented: $showingAlert) {
             switch alertType {
             case "AskIfSure":
                 return Alert(title: Text("Aufgabe abschliessen"), message: Text("Sind Sie sicher, dass die Aufgabe abgeschlossen werden soll ?"), primaryButton: .default(Text("Ja").bold(), action: {
@@ -146,7 +133,7 @@ struct TaskDetailsView: View {
                 }))
             }
         }
-        .navigationBarTitle(name)
+        .navigationBarTitle(Text(name))
         .navigationBarItems(trailing:
             Button("Zeit erfassen") {
                 self.showTimeBook = true
@@ -154,21 +141,19 @@ struct TaskDetailsView: View {
                 TimeView(taskID: self.taskID, isPresented: self.$showTimeBook)
             }
         )
-        .onAppear() {self.updateView()}
-        
+        .onAppear() {
+            self.updateView()}
     }
     
     func updateView() {
-        RequestService().updateTimeRecords(taskID: self.taskID) {records in
-            self.timeRecords = records
-            self.progress = progressService().getProgress(guideTime: self.guideTime, bookedTime: self.timeRecords)
+        RequestService().getTaskById(taskID: self.taskID) {data in
+            self.name = data.title
+            self.desc = data.description
+            self.user = data.users
+            self.guideTime = data.guide_time
+            self.bookedTime = progressService().getTotalBookedTime(timeRecords: [data])
+            self.timeRecords = data.records
         }
     }
     
-}
-
-struct TaskDetailsView_preview: PreviewProvider {
-    static var previews: some View {
-        TaskDetailsView()
-    }
 }

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		872BAEF424727D0B00B709D4 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 872BAEF324727D0B00B709D4 /* AuthenticationServices.framework */; };
-		87425E6A246428710014C137 /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87425E69246428710014C137 /* ProgressBar.swift */; };
+		87425E6A246428710014C137 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87425E69246428710014C137 /* ProgressView.swift */; };
 		87425E6C24642EC90014C137 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 87425E6B24642EC90014C137 /* Colors.xcassets */; };
 		8765E1B62466A495004A3DBF /* UserCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8765E1B52466A495004A3DBF /* UserCardView.swift */; };
 		8765E1B82466D232004A3DBF /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8765E1B72466D232004A3DBF /* Settings.swift */; };
@@ -55,7 +55,7 @@
 /* Begin PBXFileReference section */
 		872BAEF124727D0B00B709D4 /* PROtrack.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PROtrack.entitlements; sourceTree = "<group>"; };
 		872BAEF324727D0B00B709D4 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
-		87425E69246428710014C137 /* ProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
+		87425E69246428710014C137 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		87425E6B24642EC90014C137 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		8765E1B52466A495004A3DBF /* UserCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCardView.swift; sourceTree = "<group>"; };
 		8765E1B72466D232004A3DBF /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 		87425E68246428630014C137 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				87425E69246428710014C137 /* ProgressBar.swift */,
+				87425E69246428710014C137 /* ProgressView.swift */,
 				8765E1B52466A495004A3DBF /* UserCardView.swift */,
 			);
 			path = Helpers;
@@ -381,7 +381,7 @@
 				87C22AD5245F59D60014658A /* TaskOverview.swift in Sources */,
 				87F9F8BC246721CC00765BA5 /* ServerData.swift in Sources */,
 				87C22AA1245F58E90014658A /* ContentView.swift in Sources */,
-				87425E6A246428710014C137 /* ProgressBar.swift in Sources */,
+				87425E6A246428710014C137 /* ProgressView.swift in Sources */,
 				87C22ADB245F5A180014658A /* CreateProject.swift in Sources */,
 				87C22ADD245F5A1E0014658A /* CreateTask.swift in Sources */,
 			);

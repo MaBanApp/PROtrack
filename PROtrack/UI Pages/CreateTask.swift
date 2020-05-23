@@ -35,13 +35,11 @@ struct CreateTaskView: View {
                 Section(header: Text("Aufgabenname")){
                     TextField("Aufgabentitel", text: $TaskName)
                 }
-            
                 Section(header: Text("Beschreibung")) {
                     ScrollView {
                         TextField("Beschreibung", text: $TaskDescription)
                     }.frame(height:120)
                 }
-                
                 Section(header: Text("Richtzeit")) {
                     HStack {
                         TextField("Zeit", text: $GuideTime).keyboardType(.numberPad)
@@ -49,10 +47,9 @@ struct CreateTaskView: View {
                         Text("Minuten")
                     }
                 }
-                
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
-                        UserCardViewSelectable(SelectedMembers: $selectedMembers)
+                        UserCardViewSelectable(SelectedMembers: $selectedMembers, projectID: self.projectID)
                     }
                 }
                 

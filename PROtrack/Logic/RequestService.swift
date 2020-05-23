@@ -47,6 +47,24 @@ class RequestService {
         }
     }
     
+    func getProjectById(projectID: Int, completion: @escaping (ProjectPayload) -> Void) {
+        let url:String = apiUrl + "/project/" + String(projectID) + "?user=" + userID
+        
+        AF.request(url, method: .get).response {response in
+                        
+            guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    let datapath = try json["payload"].rawData()
+                    let data = try JSONDecoder().decode(ProjectPayload.self, from: datapath)
+                    completion(data)
+                } catch let error {
+                    print("API Error: ", error)
+                }
+        }
+        
+    }
+    
     //Get a List of all Tasks for the specific user
     func getTasks(completion: @escaping (TaskResponse) -> Void) {
         let url:String = apiUrl + "/tasks?user=" + userID
@@ -62,21 +80,48 @@ class RequestService {
         }
     }
     
-    //Get a List of all Users registered
-    func getUsers(completion: @escaping ([UserData]) -> Void) {
-        let url:String = apiUrl + "/users?user=" + userID
-         
+    //Get the taskinformations by ID
+    func getTaskById(taskID: Int, completion: @escaping (TaskPayload) -> Void) {
+        let url:String = apiUrl + "/task/" + String(taskID) + "?user=" + userID
         AF.request(url, method: .get).response {response in
+                        
             guard let data = response.data else { return }
-            do {
-                let json = JSON(data)
-                let datapath = try json["payload"].rawData()
-                let data = try JSONDecoder().decode([UserData].self, from: datapath)
-                completion(data)
-            } catch let error {
-                print("API Error: ", error)
+                do {
+                    let json = JSON(data)
+                    let datapath = try json["payload"].rawData()
+                    let data = try JSONDecoder().decode(TaskPayload.self, from: datapath)
+                    completion(data)
+                } catch let error {
+                    print("API Error: ", error)
+                }
+        }
+
+    }
+    
+    //Get a List of all Users registered
+    func getUsers(projectID: Int, completion: @escaping ([UserData]) -> Void) {
+        let url:String = apiUrl + "/users?user=" + userID
+
+        if projectID == 0 {
+            AF.request(url, method: .get).response {response in
+                guard let data = response.data else { return }
+                do {
+                    let json = JSON(data)
+                    let datapath = try json["payload"].rawData()
+                    let data = try JSONDecoder().decode([UserData].self, from: datapath)
+                    completion(data)
+                } catch let error {
+                    print("API Error: ", error)
+                }
             }
         }
+        else
+        {
+            getProjectById(projectID: projectID) { data in
+                completion(data.users)
+            }
+        }
+        
     }
     
     //Update time records for Task
@@ -171,6 +216,19 @@ class RequestService {
         }
         
     }
+    
+    //Add user to a task
+    func addUserToTask(taskID: Int, user: Int, completion: @escaping (String, Int) -> Void) {
+        //let url:String = apiUrl + "/project/" + String(taskID) +  "/user/" + String(user) + "?user=" + userID
+          
+           AF.request(url, method: .post).responseJSON {response in
+              guard let data = response.data else { return }
+                  do {
+                      let json = JSON(data)
+                      completion(json["message"].stringValue, json["status"].intValue)
+                  }
+          }
+    }
 
     //Change the Status of the Project or Task, depending on wich ID was given
     func changeStatus(projectID: Int, taskID: Int, newStatus: Int, completion: @escaping (String, Int) -> Void) {
@@ -206,4 +264,5 @@ class RequestService {
                 }
         }
     }
+    
 }

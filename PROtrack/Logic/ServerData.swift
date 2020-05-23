@@ -9,6 +9,7 @@
 import Foundation
 
 struct ProjectResponse: Codable {
+    
     let message     : String
     let status      : Int
     let payload     : [ProjectPayload]
@@ -33,7 +34,7 @@ struct TaskPayload: Codable {
     let id          : Int
     let title       : String
     let description : String
-    let guide_time  : String
+    let guide_time  : Int
     let status      : Int
     let users       : [UserData]
     let records     : [TimeRecords]
@@ -51,5 +52,5 @@ struct TimeRecords: Codable {
     let user        : UserData
     let description : String
     let date        : String
-    let time        : String
+    let time        : Int
 }

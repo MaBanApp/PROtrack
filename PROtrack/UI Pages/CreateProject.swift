@@ -47,20 +47,23 @@ struct CreateProjectView: View {
                 , trailing:
                 Button(self.editProject ? "Aktualisieren" : "Erstellen") {
                     if self.editProject {
+                        print("aktualisiere")
+
                         RequestService().editProject(projectID: self.projectID, title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers) {message, status in
-                        if status >= 300 {
-                            self.APIResponse = message
-                        }
-                        if status <= 300 {
-                            self.APIResponse = message
-                            self.showingAlert.toggle()
+                            if status >= 300 {
+                                self.APIResponse = message
+                            }
+                            if status <= 300 {
+                                self.APIResponse = message
+                                self.showingAlert.toggle()
+                            }
                         }
                     }
-                    }
-                    else
+                    if !self.editProject
                     {
                         RequestService().createProject(title: self.ProjectName, desc: self.ProjectDescription, users: self.selectedMembers){ message, status in
                             if status >= 300 {
+                                print(message)
                                 self.APIResponse = message
                             }
                             if status <= 300 {
