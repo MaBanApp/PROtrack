@@ -11,23 +11,23 @@ import SwiftUI
 struct TaskDetailsView: View {
 
     //Initalizer vars
-    @State var taskID: Int = 0
-    @State var projectID: Int = 0
+    @State var taskID                   : Int = 0
+    @State var projectID                : Int = 0
 
     //Data vars
-    @State private var name: String = "Lade Aufgabe..."
-    @State private var desc: String = ""
-    @State private var user: [UserData] = []
-    @State private var guideTime: Int = 0
-    @State private var bookedTime: Int = 0
-    @State private var timeRecords: [TimeRecords] = []
+    @State private var name             : String = "Lade Aufgabe..."
+    @State private var desc             : String = ""
+    @State private var user             : [UserData] = []
+    @State private var guideTime        : Int = 0
+    @State private var bookedTime       : Int = 0
+    @State private var timeRecords      : [TimeRecords] = []
     
     //UI Vars
-    @State private var showTimeBook:Bool = false
-    @State private var showingAlert = false
-    @State private var alertType: String = ""
-    @State private var isExpanded: Bool = false
-    @State private var APIResponse: String = ""
+    @State private var showTimeBook     : Bool = false
+    @State private var showingAlert     = false
+    @State private var alertType        : String = ""
+    @State private var isExpanded       : Bool = false
+    @State private var APIResponse      : String = ""
     
     var body: some View {
         List{
@@ -144,6 +144,11 @@ struct TaskDetailsView: View {
         .onAppear() {
             self.updateView()}
     }
+    
+}
+
+//View-dependend functions
+extension TaskDetailsView {
     
     func updateView() {
         RequestService().getTaskById(taskID: self.taskID) {data in

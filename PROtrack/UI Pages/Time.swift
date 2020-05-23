@@ -13,23 +13,21 @@ struct TimeView: View {
     //Initalizer vars
     @State var taskID: Int = 0
     
-    //Private vars
-    @State private var time:String = ""
-    @State private var date = Date()
-    @State private var notes:String = ""
-    @State private var userID: Int = AppDelegate().settings.integer(forKey: "UserID")
-    @State private var APImessage: String = ""
+    //Data vars
+    @State private var time             : String = ""
+    @State private var date             = Date()
+    @State private var notes            : String = ""
+    @State private var userID           : Int = AppDelegate().settings.integer(forKey: "UserID")
+    @State private var APImessage       : String = ""
     
     //UI Vars
-    @Binding var isPresented: Bool
-    @State private var isEditing:Bool = false
-    @State private var showingAlert: Bool = false
+    @Binding var isPresented            : Bool
+    @State private var isEditing        : Bool = false
+    @State private var showingAlert     : Bool = false
     
     
     var body: some View {
-        
         NavigationView {
-            
             List{
                 Section(header: Text("Datum")){
                     DatePicker("Datum auswählen", selection: $date, displayedComponents: .date)
@@ -97,6 +95,11 @@ struct TimeView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
+    
+}
+
+//View-dependend functions
+extension TimeView {
     
     func endEditing() {
         let keyWindow = UIApplication.shared.connectedScenes

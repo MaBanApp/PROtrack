@@ -10,36 +10,34 @@ import SwiftUI
 
 struct CreateProjectView: View {
     
-    @State var ProjectName:String = ""
-    @State var ProjectDescription:String = ""
-    @State var selectedMembers:[Int] = []
-    @State var editProject: Bool = false
-    @State var projectID: Int = 0
+    //Initalizer vars
+    @State var ProjectName              : String = ""
+    @State var ProjectDescription       : String = ""
+    @State var selectedMembers          : [Int] = []
+    @State var editProject              : Bool = false
+    @State var projectID                : Int = 0
 
-    @Binding var isPresented: Bool
-    @State private var showingAlert: Bool = false
-    @State private var APIResponse: String = ""
+    //UI Vars
+    @Binding var isPresented            : Bool
+    @State private var showingAlert     : Bool = false
+    @State private var APIResponse      : String = ""
         
     var body: some View {
-        
         NavigationView {
             List{
                 Section(header: Text("Projektname")){
                     TextField("Projektname", text: $ProjectName)
                 }
-                
                 Section(header: Text("Projektbeschreibung")) {
                     ScrollView {
                         TextField("Projektbeschreibung", text: $ProjectDescription)
                     }.frame(height:120)
                 }
-                
                 Section(header: Text("Mitglieder")) {
                     ScrollView(.horizontal, showsIndicators: false){
                         UserCardViewSelectable(SelectedMembers: $selectedMembers)
                     }
                 }
-
             }.navigationBarTitle(self.editProject ? Text("Projekt editieren") : Text("Neues Projekt erstellen"), displayMode: .inline)
             .navigationBarItems(
                 leading:
@@ -80,6 +78,5 @@ struct CreateProjectView: View {
                     self.isPresented.toggle()
             }))}
             .navigationViewStyle(StackNavigationViewStyle())
-        
     }
 }

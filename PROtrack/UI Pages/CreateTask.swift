@@ -11,26 +11,22 @@ import SwiftUI
 struct CreateTaskView: View {
     
     //Initalizer vars
-    @State var projectID: Int = 0
+    @State var projectID                : Int = 0
+    @State var TaskName                 : String = ""
+    @State var TaskDescription          : String = ""
+    @State var GuideTime                : String = ""
     
-    @State var TaskName:String = ""
-    @State var TaskDescription:String = ""
-    @State var GuideTime: String = ""
-    
-    @State var selectedMembers:[Int] = []
-    @State var userData: [UserData] = []
-    
-    @State private var APIResponse: String = ""
-    
+    @State var selectedMembers          : [Int] = []
+    @State var userData                 : [UserData] = []
+        
     //UI Vars
     @Binding var isPresented            : Bool
     @State private var showingAlert     : Bool = false
+    @State private var APIResponse      : String = ""
 
     
-    var body: some View {
-        
+    var body: some View {     
         NavigationView {
-            
             List {
                 Section(header: Text("Aufgabenname")){
                     TextField("Aufgabentitel", text: $TaskName)
@@ -52,7 +48,6 @@ struct CreateTaskView: View {
                         UserCardViewSelectable(SelectedMembers: $selectedMembers, projectID: self.projectID)
                     }
                 }
-                
             }.navigationBarTitle(Text("Neue Aufgabe erstellen"), displayMode: .inline)
             .navigationBarItems(
                 leading:
@@ -75,7 +70,6 @@ struct CreateTaskView: View {
                 }
             })
             .listStyle(GroupedListStyle())
-            
         }.alert(isPresented: self.$showingAlert) {
             Alert(title: Text(""), message: Text(self.APIResponse), dismissButton: .default(Text("OK").bold(), action: {
                 self.isPresented.toggle()

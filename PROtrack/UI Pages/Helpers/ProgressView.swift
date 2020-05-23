@@ -11,9 +11,10 @@ import SwiftUI
 
 struct ProgressView: View {
     
+    //Data vars
     @Binding var guideTime        : Int
     @Binding var bookedTime       : Int
-    @State private var progress : Float = 0.00
+    @State private var progress   : Float = 0.00
         
     var body: some View {
         VStack{

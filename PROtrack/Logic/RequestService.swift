@@ -219,7 +219,7 @@ class RequestService {
     
     //Add user to a task
     func addUserToTask(taskID: Int, user: Int, completion: @escaping (String, Int) -> Void) {
-        //let url:String = apiUrl + "/project/" + String(taskID) +  "/user/" + String(user) + "?user=" + userID
+        let url:String = apiUrl + "/project/" + String(taskID) +  "/user/" + String(user) + "?user=" + userID
           
            AF.request(url, method: .post).responseJSON {response in
               guard let data = response.data else { return }

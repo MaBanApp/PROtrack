@@ -14,7 +14,7 @@ struct ProjectDetailsView: View {
     @State var projectID                : Int
     @State var payloadID                : Int
     
-    //Data Vars
+    //Data vars
     @State private var name             : String = "Lade Projekt..."
     @State private var desc             : String = ""
     @State private var user             : [UserData]?
@@ -31,81 +31,80 @@ struct ProjectDetailsView: View {
     @State private var APIResponse      : String = ""
     
     var body: some View {
-        
         List{
-                Section(header: Text("Projektfortschritt")){
-                    ProgressView(guideTime: $guideTime, bookedTime: $bookedTime)
+            Section(header: Text("Projektfortschritt")){
+                ProgressView(guideTime: $guideTime, bookedTime: $bookedTime)
+            }
+            Section(header: Text("Beschreibung")){
+                if ready {
+                    ScrollView{
+                        Text(desc)
+                    }.frame(height:145)
                 }
-                Section(header: Text("Beschreibung")){
-                    if ready {
-                        ScrollView{
-                            Text(desc)
-                        }.frame(height:145)
-                    }
-                    else
-                    {
-                        ScrollView {
-                            Text("Wird geladen...").italic().foregroundColor(Color.gray)
-                        }.frame(height:145)
-                    }
+                else
+                {
+                    ScrollView {
+                        Text("Wird geladen...").italic().foregroundColor(Color.gray)
+                    }.frame(height:145)
+                }
 
-                }
-                Section(header: Text("Beteiligte")){
-                    if ready {
-                        ScrollView(.horizontal) {
-                            if self.user!.count == 0 {
-                                Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
-                            }
-                            else
-                            {
-                                UserCardView(ProjectMember: self.user!)
-                            }
-                        }.frame(height:86, alignment: .top)
-                    }
-                    else
-                    {
-                        Text("Wird geladen...").italic().foregroundColor(Color.gray).frame(height: 86)
-                    }
-                }
-                Section(header: Text("Projektaufgaben")){
-                    if ready {
-                        if tasks?.count == 0{
-                            Text("Noch keine Aufgaben hinzugefügt").italic().foregroundColor(Color.gray)
+            }
+            Section(header: Text("Beteiligte")){
+                if ready {
+                    ScrollView(.horizontal) {
+                        if self.user!.count == 0 {
+                            Text("Noch keine Mitarbeiter hinzugefügt").italic().foregroundColor(Color.gray)
                         }
                         else
                         {
-                            ForEach (tasks!.indices) {i in
-                                if self.tasks![i].status == 1 {
-                                    NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
-                                                                                projectID: self.projectID)){
-                                    Text(self.tasks![i].title)}
-                                }
-                                else
-                                {
-                                    NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
-                                                                                projectID: self.projectID)){
-                                    Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
-                                }
-                            }.id(UUID())
+                            UserCardView(ProjectMember: self.user!)
                         }
+                    }.frame(height:86, alignment: .top)
+                }
+                else
+                {
+                    Text("Wird geladen...").italic().foregroundColor(Color.gray).frame(height: 86)
+                }
+            }
+            Section(header: Text("Projektaufgaben")){
+                if ready {
+                    if tasks?.count == 0{
+                        Text("Noch keine Aufgaben hinzugefügt").italic().foregroundColor(Color.gray)
+                    }
+                    else
+                    {
+                        ForEach (tasks!.indices) {i in
+                            if self.tasks![i].status == 1 {
+                                NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
+                                                                            projectID: self.projectID)){
+                                Text(self.tasks![i].title)}
+                            }
+                            else
+                            {
+                                NavigationLink(destination: TaskDetailsView(taskID: self.tasks![i].id,
+                                                                            projectID: self.projectID)){
+                                Text(self.tasks![i].title).italic().strikethrough().foregroundColor(Color.gray)}
+                            }
+                        }.id(UUID())
                     }
                 }
-                Section(header: Text("Projekt verwalten")){
-                    Button("Projekt bearbeiten"){
-                        self.showEditProject.toggle()
-                    }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject, onDismiss: {self.updateView()}) {
-                        CreateProjectView(ProjectName: self.name,
-                                          ProjectDescription: self.desc,
-                                          editProject: true,
-                                          projectID: self.projectID,
-                                          isPresented: self.$showEditProject)
-                    }
-                    Button("Projekt abschliessen"){
-                        self.showingAlert.toggle()
-                        self.alertType = "AskIfSure"
-                        
-                    }.foregroundColor(Color.red)
-                }.listStyle(GroupedListStyle())
+            }
+            Section(header: Text("Projekt verwalten")){
+                Button("Projekt bearbeiten"){
+                    self.showEditProject.toggle()
+                }.foregroundColor(Color.blue).sheet(isPresented: $showEditProject, onDismiss: {self.updateView()}) {
+                    CreateProjectView(ProjectName: self.name,
+                                      ProjectDescription: self.desc,
+                                      editProject: true,
+                                      projectID: self.projectID,
+                                      isPresented: self.$showEditProject)
+                }
+                Button("Projekt abschliessen"){
+                    self.showingAlert.toggle()
+                    self.alertType = "AskIfSure"
+                    
+                }.foregroundColor(Color.red)
+            }.listStyle(GroupedListStyle())
         }
         .alert(isPresented: $showingAlert) {
             switch alertType {
@@ -153,6 +152,11 @@ struct ProjectDetailsView: View {
         .onAppear() {
             self.updateView()}
     }
+
+}
+
+//View-dependend functions
+extension ProjectDetailsView {
     
     func updateView() {
         RequestService().getProjects() { data in

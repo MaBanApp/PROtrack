@@ -21,7 +21,6 @@ struct ProjectOverviewView: View {
     @State private var NavBarTitle      : String = "Projekte"
 
     var body: some View {
-
         NavigationView {
             List{
                 Section(header: Text("Laufende Projekte")){
@@ -73,10 +72,15 @@ struct ProjectOverviewView: View {
     }
     }
     
+}
+
+//View-dependend functions
+extension ProjectOverviewView {
+    
     func updateView() {
-        RequestService().getProjects() {data in
-            self.projData = data
-        }
-    }
+         RequestService().getProjects() {data in
+             self.projData = data
+         }
+     }
     
 }

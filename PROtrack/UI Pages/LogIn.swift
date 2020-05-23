@@ -10,18 +10,19 @@ import SwiftUI
 
 struct LogInView: View {
     
-    @State var Username: String = ""
-    @State var Password: String = ""
-    @State var isLoggedIn: Bool = false
-    @State var settingsShown:Bool = false
+    //Data vars
+    @State var Username             : String = ""
+    @State var Password             : String = ""
+    @State var isLoggedIn           : Bool = false
+    @State var settingsShown        : Bool = false
+    @State var userData             : [Int] = []
+    @State var projData             : ProjectResponse?
     
-    @State var userData: [Int] = []
-    @State var projData: ProjectResponse?
-    @State private var alertShown: Bool = false
-    @State private var message: String = ""
+    //UI vars
+    @State private var alertShown   : Bool = false
+    @State private var message      : String = ""
     
-    var body: some View {
-        
+    var body: some View {   
         ZStack{
             VStack{
                 HStack{
@@ -103,6 +104,11 @@ struct LogInView: View {
         
     }
     
+}
+
+
+//View-dependend functions
+extension LogInView {
     
     func endEditing() {
         let keyWindow = UIApplication.shared.connectedScenes
@@ -114,10 +120,4 @@ struct LogInView: View {
                        keyWindow?.endEditing(true)
     }
     
-}
-
-struct LogInView_Preview: PreviewProvider {
-    static var previews: some View {
-        LogInView()
-    }
 }
