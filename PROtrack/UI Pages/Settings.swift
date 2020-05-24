@@ -18,7 +18,7 @@ struct SettingView: View {
         NavigationView{
             List{
                 Section(header: Text("Servereinstellungen")) {
-                    TextField("Serveradresse", text: $url)
+                    TextField("Serveradresse", text: $url).keyboardType(.webSearch)
                 }
             }.navigationBarTitle(Text("Einstellungen"), displayMode: .inline)
             .navigationBarItems(

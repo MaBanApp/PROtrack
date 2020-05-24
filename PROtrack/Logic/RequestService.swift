@@ -84,6 +84,7 @@ class RequestService {
     //Get the taskinformations by ID
     func getTaskById(taskID: Int, completion: @escaping (TaskPayload) -> Void) {
         let url:String = apiUrl + "/task/" + String(taskID) + "?user=" + userID
+        
         AF.request(url, method: .get).response {response in
                         
             guard let data = response.data else { return }
@@ -97,6 +98,23 @@ class RequestService {
                 }
         }
 
+    }
+    
+    //Get all tasks wich are assigned to the userID
+    func getTaskWithUser(userID: Int, completion: @escaping ([Int]) -> Void) {
+        var taskIDs: [Int] = []
+        
+        getTasks() {data in
+            for i in data.payload.indices {
+                for ti in data.payload[i].users.indices {
+                    if data.payload[i].users[ti].id == userID {
+                        taskIDs.append(data.payload[i].users[ti].id)
+                        print(taskIDs)
+                    }
+                }
+            }
+        completion(taskIDs)
+        }
     }
     
     //Get a List of all Users registered
