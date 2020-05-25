@@ -35,29 +35,28 @@ struct LogInView: View {
                 }
                 
                 Group{
-                        Spacer().frame(height: 40)
-                        Text("Willkommen bei PROtrack").bold().font(.system(size: 28))
-                        Spacer().frame(height: 60)
-                        Text("Bitte loggen Sie sich ein").italic().padding().frame(width: UIScreen.main.bounds.width, height: 30, alignment: .leading)
-                        Spacer().frame(height: 5)
-                        HStack {
-                            Image(systemName: "person").foregroundColor(.gray)
-                            TextField("Benutzername", text: $Username).onTapGesture {
-                                self.Username = ""
-                            }.textContentType(.username)
-                        }.padding(10)
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-                            .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
-
-                        HStack {
-                                Image(systemName: "lock").foregroundColor(.gray)
-                                SecureField("Passwort", text: $Password).onTapGesture {
-                                    self.Password = ""
-                                }.textContentType(.password)
-                            }.padding(10)
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-                            .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
-                        Spacer().frame(height: 20)
+                    Spacer().frame(height: 40)
+                    Text("Willkommen bei PROtrack").bold().font(.system(size: 28)).foregroundColor(.white)
+                    Spacer().frame(height: 60)
+                    Text("Bitte loggen Sie sich ein").italic().padding().frame(width: UIScreen.main.bounds.width, height: 30, alignment: .leading).foregroundColor(.white)
+                    Spacer().frame(height: 5)
+                    HStack {
+                        Image(systemName: "person").foregroundColor(.gray)
+                        TextField("Benutzername", text: $Username).onTapGesture {
+                            self.Username = ""
+                        }.textContentType(.username).colorInvert()
+                    }.padding(10)
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+                        .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
+                    HStack {
+                            Image(systemName: "lock").foregroundColor(.gray)
+                            SecureField("Passwort", text: $Password).onTapGesture {
+                                self.Password = ""
+                            }.textContentType(.password).colorInvert()
+                    }.padding(10)
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+                        .frame(width: UIScreen.main.bounds.width - 30, alignment: .center)
+                    Spacer().frame(height: 20)
                     }
                 Button(action: {
                     if AppDelegate().settings.string(forKey: "ServerURL") == nil {
@@ -83,7 +82,7 @@ struct LogInView: View {
                         }
                     }
                     self.endEditing()
-                    }) {Text("Anmelden").bold().font(.system(size: 20))}
+                }) {Text("Anmelden").bold().font(.system(size: 20))}
                     .alert(isPresented: self.$alertShown) {
                         Alert(title: Text("Fehler beim Anmelden"), message: Text(message), dismissButton: .default(Text("OK")))
                     }
@@ -100,7 +99,7 @@ struct LogInView: View {
                     TaskOverviewView(userID: userData[0], isPresented: $isLoggedIn)
                 }
             }
-        }
+        }.background(Image("BackgroundImage").resizable().scaledToFill().edgesIgnoringSafeArea(.top))
         
     }
     

@@ -29,7 +29,6 @@ struct TaskDetailsView: View {
     @State private var showingAlert     = false
     @State private var showEditTask     : Bool = false
     @State private var alertType        : String = ""
-    @State private var isExpanded       : Bool = false
     @State private var APIResponse      : String = ""
     
     var body: some View {
@@ -81,21 +80,11 @@ struct TaskDetailsView: View {
                             Text(self.timeRecords[i].date).frame(width: 120, alignment: .leading)
                             Text("\(self.timeRecords[i].time) Minuten").frame(width: 120, alignment: .leading)
                             Text("\(self.timeRecords[i].user.name)").frame(minWidth: 120, alignment: .leading)
-                            
                         }
                         
-                        if self.isExpanded {
-                            Spacer()
-                            Text("Bemerkungen").bold().frame(height: 30, alignment: .leading)
-                            Text(self.timeRecords[i].description).frame(alignment: .leading)
-                        }
-                        
-                    }.onTapGesture {
-                        withAnimation(.linear(duration: 0.2)) {
-                            self.isExpanded.toggle()
-                        }
-                }
-
+                        Text("Bemerkungen").bold().frame(height: 30, alignment: .leading)
+                        Text(self.timeRecords[i].description).frame(alignment: .leading)
+                    }
                 }.id(UUID())
             }
         }
