@@ -100,7 +100,7 @@ class RequestService {
 
     }
     
-    //Get all tasks wich are assigned to the userID
+    //Get ID of tasks wich are assigned to the userID
     func getTaskWithUser(userID: Int, completion: @escaping ([Int]) -> Void) {
         var taskIDs: [Int] = []
         
@@ -108,7 +108,7 @@ class RequestService {
             for i in data.payload.indices {
                 for ti in data.payload[i].users.indices {
                     if data.payload[i].users[ti].id == userID {
-                        taskIDs.append(data.payload[i].users[ti].id)
+                        taskIDs.append(data.payload[i].id)
                         print(taskIDs)
                     }
                 }

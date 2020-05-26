@@ -15,7 +15,8 @@ struct TaskOverviewView: View {
     @Binding var isPresented    : Bool
     
     //Data vars
-    @State var taskData         : TaskPayload?
+    @State private var tasksIDs : [Int] = []
+    @State private var taskData : TaskResponse?
     
     //UI vars
     @State private var ready    : Bool = false
@@ -25,7 +26,16 @@ struct TaskOverviewView: View {
             List{
                 Section(header: Text("Offene Aufgaben")){
                     if ready {
-                        Text("Keine Aufgaben")
+                        ForEach(taskData!.payload.indices) {i in
+                            if self.tasksIDs.contains(self.taskData!.payload[i].id){
+                                if self.taskData!.payload[i].status == 1 {
+                                    NavigationLink(destination: TaskDetailsView(taskID: self.taskData!.payload[i].id,
+                                                                                isFinished: false)){
+                                        Text(self.taskData!.payload[i].title)
+                                    }
+                                }
+                            }
+                        }.id(UUID())
                     }
                     else
                     {
@@ -33,7 +43,18 @@ struct TaskOverviewView: View {
                     }
                 }
                 Section(header: Text("Abgeschlossene Aufgaben")) {
-                    Text("Noch keine abgeschlossenen Aufgaben").italic().foregroundColor(Color.gray)
+                    if ready {
+                        ForEach(taskData!.payload.indices) {i in
+                            if self.tasksIDs.contains(self.taskData!.payload[i].id){
+                                if self.taskData!.payload[i].status == 2 {
+                                    NavigationLink(destination: TaskDetailsView(taskID: self.taskData!.payload[i].id,
+                                                                                isFinished: false)){
+                                        Text(self.taskData!.payload[i].title)
+                                    }
+                                }
+                            }
+                        }.id(UUID())
+                    }
                 }
             }.listStyle(GroupedListStyle())
         .navigationBarTitle(Text("Meine Aufgaben"))
@@ -50,8 +71,12 @@ struct TaskOverviewView: View {
 //View-dependend functions
 extension TaskOverviewView {
     func updateView() {
-        RequestService().getTaskWithUser(userID: userID) {data in
-            self.ready = true
+        RequestService().getTaskWithUser(userID: userID) {tID in
+            self.tasksIDs = tID
+            RequestService().getTasks() {data in
+                self.taskData = data
+                self.ready = true
+            }
         }
     }
 }
