@@ -75,7 +75,7 @@ struct CreateTaskView: View {
                                                 title: self.TaskName,
                                                 desc: self.TaskDescription,
                                                 guideTime: self.GuideTime,
-                                                Users: self.selectedMembers) { message, status in
+                                                users: self.selectedMembers) { message, status in
                         if status >= 300 {
                             self.alertType = "Error"
                             self.APIResponse = message

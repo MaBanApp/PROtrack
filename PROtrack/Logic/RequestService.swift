@@ -186,7 +186,7 @@ class RequestService {
     }
     
     //Create new task
-    func createTask(projectID: Int, title: String, desc: String, guideTime: String, Users: [Int], completion: @escaping (String, Int) -> Void) {
+    func createTask(projectID: Int, title: String, desc: String, guideTime: String, users: [Int], completion: @escaping (String, Int) -> Void) {
         let url:String = apiUrl + "/project/" + String(projectID) + "/tasks?user=" + userID
         let params = ["title" : title, "description" : desc , "guide_time" : guideTime] as [String : Any]
         
@@ -194,7 +194,15 @@ class RequestService {
            guard let data = response.data else { return }
                do {
                    let json = JSON(data)
-                   completion(json["message"].stringValue, json["status"].intValue)
+                
+                   for i in users.indices {
+                       self.addUserToTask(taskID: json["payload"]["id"].intValue,  user: users[i]) { message, int in
+                           if i == users.count - 1 {
+                               completion(json["message"].stringValue, json["status"].intValue)
+                           }
+                       }
+
+                   }
                }
        }
         
@@ -216,7 +224,6 @@ class RequestService {
                                 completion(json["message"].stringValue, json["status"].intValue)
                             }
                         }
-
                     }
                 }
         }
@@ -238,7 +245,7 @@ class RequestService {
     
     //Add user to a task
     func addUserToTask(taskID: Int, user: Int, completion: @escaping (String, Int) -> Void) {
-        let url:String = apiUrl + "/project/" + String(taskID) +  "/user/" + String(user) + "?user=" + userID
+        let url:String = apiUrl + "/task/" + String(taskID) +  "/user/" + String(user) + "?user=" + userID
           
            AF.request(url, method: .post).responseJSON {response in
               guard let data = response.data else { return }
